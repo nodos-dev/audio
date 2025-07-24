@@ -1,0 +1,18 @@
+{
+	"info": {
+		"id": {
+			"name": "nos.audio",
+			"version": "0.1.0"
+		},
+		"description": "Nodos plugin for audio processing.",
+		"display_name": "Audio",
+		"dependencies": [
+			{
+				"name": "nos.sys.vulkan",
+				"version": "6.28"
+			}
+		],
+		"category": "Audio"
+	},
+	"binary_path": "Binaries/nosAudio"
+}
