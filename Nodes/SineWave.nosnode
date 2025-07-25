@@ -34,8 +34,8 @@
 						"data": 48000
 					},
 					{
-						"name": "NumSamples",
-						"type_name": "uint",
+						"name": "AudioPacketDescriptor",
+						"type_name": "nos.audio.AudioPacketDescriptor",
 						"show_as": "OUTPUT_PIN",
 						"can_show_as": "OUTPUT_PIN_ONLY"
 					},

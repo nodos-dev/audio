@@ -1,0 +1,14 @@
+namespace nos.audio;
+
+enum BitDepth: uint
+{
+    AUDIO_BIT_DEPTH_24_BIT = 0
+}
+
+struct AudioPacketDescriptor
+{
+    sample_rate: uint;
+    num_samples: uint;
+    bit_depth: BitDepth;
+    sample_stride: uint; // Number of bytes from one sample to another sample
+}

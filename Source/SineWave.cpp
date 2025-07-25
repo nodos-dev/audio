@@ -9,6 +9,8 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#include "Audio_generated.h"
+
 namespace nos::audio
 {
 struct SineWave : NodeContext
@@ -42,19 +44,15 @@ struct SineWave : NodeContext
 			return NOS_RESULT_FAILED;
 		}
 		
-		TimeSoFar += pins.FixedStepTiming.DeltaSeconds.x;
-		
 		uint64_t deltaNumerator = pins.FixedStepTiming.DeltaSeconds.x;
 		uint64_t deltaDenominator = pins.FixedStepTiming.DeltaSeconds.y;
 		
-		// Accumulate samples using fixed-point arithmetic: (delta * sampleRate) / denominator
 		AccumulatedSampleNumerator += deltaNumerator * static_cast<uint64_t>(sampleRate);
 		
 		uint32_t numSamples = static_cast<uint32_t>(AccumulatedSampleNumerator / deltaDenominator);
 		AccumulatedSampleNumerator %= deltaDenominator; // Keep remainder for next frame
 		
 		// Create or resize audio buffer only if needed (with 1.5x headroom to avoid frequent reallocations)
-		// AJA expects 32-bit words (24-bit samples in MSB)
 		size_t requiredBufferSize = numSamples * sizeof(uint32_t);
 		size_t allocatedBufferSize = AudioPacket ? AudioPacket->Info.Buffer.Size : 0;
 		
@@ -69,7 +67,7 @@ struct SineWave : NodeContext
 			audioBufferDesc.Size = static_cast<uint32_t>(newBufferSize);
 			audioBufferDesc.Usage = nosBufferUsage(NOS_BUFFER_USAGE_STORAGE_BUFFER | NOS_BUFFER_USAGE_TRANSFER_DST | NOS_BUFFER_USAGE_TRANSFER_SRC);
 			audioBufferDesc.MemoryFlags = NOS_MEMORY_FLAGS_HOST_VISIBLE;
-			audioBufferDesc.ElementType = NOS_BUFFER_ELEMENT_TYPE_UINT32;
+			audioBufferDesc.ElementType = NOS_BUFFER_ELEMENT_TYPE_INT32;
 			audioBufferDesc.FieldType = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
 			
 			AudioPacket = vkss::Resource::Create(audioBufferDesc, "SineWave AudioBuffer");
@@ -80,34 +78,30 @@ struct SineWave : NodeContext
 			SetPinValue(NOS_NAME("AudioPacket"), audioPacketPinData);
 		}
 		
-		// Generate sine wave samples and convert to 24-bit format for AJA
 		nosResourceShareInfo& audioBufDesc = *AudioPacket;
 		uint32_t* audioSamples = reinterpret_cast<uint32_t*>(nosVulkan->Map(&audioBufDesc));
 		if (!audioSamples) {
 			return NOS_RESULT_FAILED;
 		}
 		
-		for (uint32_t i = 0; i < numSamples; ++i) {
+		for (uint32_t i = 0; i < numSamples; ++i)
+		{
 			float sampleTime = static_cast<float>(CurrentSampleIndex + i) / static_cast<float>(sampleRate);
 			float phase = 2.0f * static_cast<float>(M_PI) * waveFrequency * sampleTime;
 			float floatSample = waveAmplitude * std::sin(phase);
 			
-			// Convert float (-1.0 to 1.0) to 24-bit integer in MSB of 32-bit word
-			// 24-bit range: -8,388,608 to 8,388,607
-			int32_t sample24bit = static_cast<int32_t>(floatSample * 8388607.0f);
-			
-			// Clamp to 24-bit range
-			sample24bit = std::max(-8388608, std::min(8388607, sample24bit));
-			
-			// Pack 24-bit sample into MSB of 32-bit word (shift left 8 bits)
-			audioSamples[i] = static_cast<uint32_t>(sample24bit << 8);
+			uint32_t sample24bit = static_cast<uint32_t>((floatSample + 1.0f) * 8388607.5f);
+			sample24bit = std::min(16777215u, sample24bit);
+			audioSamples[i] = sample24bit << 8;
 		}
 		
 		// Update current sample index for continuous playback
 		CurrentSampleIndex += numSamples;
 		
+		AudioPacketDescriptor audioPacketDesc(sampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, 32);
+		
 		// Set output pin values
-		SetPinValue(NOS_NAME("NumSamples"), numSamples);
+		SetPinValue(NOS_NAME("AudioPacketDescriptor"), audioPacketDesc);
 		
 		return NOS_RESULT_SUCCESS;
 	}
