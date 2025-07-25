@@ -34,6 +34,13 @@
 						"data": 48000
 					},
 					{
+						"name": "ChannelCount",
+						"type_name": "uint",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": 8
+					},
+					{
 						"name": "AudioPacketDescriptor",
 						"type_name": "nos.audio.AudioPacketDescriptor",
 						"show_as": "OUTPUT_PIN",

@@ -11,4 +11,5 @@ struct AudioPacketDescriptor
     num_samples: uint;
     bit_depth: BitDepth;
     sample_stride: uint; // Number of bytes from one sample to another sample
+    channel_count: uint; // Number of audio channels, each channel has its own sample in the packet and they are interleaved 
 }

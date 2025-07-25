@@ -33,7 +33,8 @@ struct SineWave : NodeContext
 		auto& waveFrequency = *pins.GetPinData<float>(NOS_NAME("WaveFrequency"));
 		auto& waveAmplitude = *pins.GetPinData<float>(NOS_NAME("WaveAmplitude"));
 		auto& sampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("SampleRate"));
-		
+		uint8_t channelCount = *pins.GetPinData<uint8_t>(NOS_NAME("ChannelCount"));
+
 		// Only support fixed step timing
 		if (pins.TimingMode != NOS_EXECUTION_TIMING_MODE_FIXED_STEP) {
 			return NOS_RESULT_FAILED;
@@ -53,7 +54,7 @@ struct SineWave : NodeContext
 		AccumulatedSampleNumerator %= deltaDenominator; // Keep remainder for next frame
 		
 		// Create or resize audio buffer only if needed (with 1.5x headroom to avoid frequent reallocations)
-		size_t requiredBufferSize = numSamples * sizeof(uint32_t);
+		size_t requiredBufferSize = numSamples * sizeof(uint32_t) * channelCount;
 		size_t allocatedBufferSize = AudioPacket ? AudioPacket->Info.Buffer.Size : 0;
 		
 		if (!AudioPacket || requiredBufferSize > allocatedBufferSize)
@@ -79,26 +80,32 @@ struct SineWave : NodeContext
 		}
 		
 		nosResourceShareInfo& audioBufDesc = *AudioPacket;
-		uint32_t* audioSamples = reinterpret_cast<uint32_t*>(nosVulkan->Map(&audioBufDesc));
+		int32_t* audioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(&audioBufDesc));
 		if (!audioSamples) {
 			return NOS_RESULT_FAILED;
 		}
 		
 		for (uint32_t i = 0; i < numSamples; ++i)
 		{
-			float sampleTime = static_cast<float>(CurrentSampleIndex + i) / static_cast<float>(sampleRate);
-			float phase = 2.0f * static_cast<float>(M_PI) * waveFrequency * sampleTime;
-			float floatSample = waveAmplitude * std::sin(phase);
+			float sampleTime = waveFrequency / static_cast<float>(sampleRate) + LastSampleTime;
+			sampleTime = std::fmod(sampleTime, 1.0f);
+			LastSampleTime = sampleTime;
+			float floatSample = waveAmplitude * std::sin(2.0f * static_cast<float>(M_PI) * sampleTime);
 			
-			uint32_t sample24bit = static_cast<uint32_t>((floatSample + 1.0f) * 8388607.5f);
-			sample24bit = std::min(16777215u, sample24bit);
-			audioSamples[i] = sample24bit << 8;
+			int32_t sample24bit = static_cast<int32_t>(floatSample * 8388607.0f);
+			sample24bit = std::max(-8388608, std::min(8388607, sample24bit));
+			int32_t sampleShifted = sample24bit << 8;
+			for (auto channel = 0; channel < channelCount; ++channel)
+			{
+				audioSamples[i * channelCount + channel] = sampleShifted; // Store as 32-bit with 24-bit sample in MSB
+			}
 		}
 		
 		// Update current sample index for continuous playback
 		CurrentSampleIndex += numSamples;
 		
-		AudioPacketDescriptor audioPacketDesc(sampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, 32);
+		AudioPacketDescriptor audioPacketDesc(
+			sampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, 32, channelCount);
 		
 		// Set output pin values
 		SetPinValue(NOS_NAME("AudioPacketDescriptor"), audioPacketDesc);
@@ -110,6 +117,7 @@ struct SineWave : NodeContext
 	uint64_t CurrentSampleIndex;
 	uint64_t TimeSoFar;
 	uint64_t AccumulatedSampleNumerator; // Accumulates fractional samples as integer numerator
+	float LastSampleTime = 0.0f;
 };
 
 nosResult RegisterSineWaveNode(nosNodeFunctions* fn)
