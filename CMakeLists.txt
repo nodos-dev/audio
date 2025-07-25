@@ -17,8 +17,10 @@ set(FLATC_EXECUTABLE ${NOS_SDK_DIR}/bin/flatc${CMAKE_EXECUTABLE_SUFFIX})
 # nos.sys.vulkan
 nos_get_module("nos.sys.vulkan" "6.28" NOS_SYS_VULKAN_TARGET)
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/External/AudioFile)
+
 # Project generation
 nos_generate_flatbuffers("${CMAKE_CURRENT_SOURCE_DIR}/Types" "${CMAKE_CURRENT_SOURCE_DIR}/Source" "cpp" "${NOS_SDK_DIR}/types" nosAudio_generated)
-list(APPEND DEPENDENCIES nosAudio_generated ${NOS_SYS_VULKAN_TARGET} ${NOS_PLUGIN_SDK_TARGET})
+list(APPEND DEPENDENCIES AudioFile nosAudio_generated ${NOS_SYS_VULKAN_TARGET} ${NOS_PLUGIN_SDK_TARGET})
 nos_add_plugin("nosAudio" "${DEPENDENCIES}" "")
 nos_group_targets("nosAudio" "NOS Plugins")

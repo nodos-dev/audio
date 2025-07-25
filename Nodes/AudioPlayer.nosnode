@@ -1,0 +1,56 @@
+{
+	"nodes": [
+		{
+			"class_name": "AudioPlayer",
+			"menu_info": {
+				"category": "Audio",
+				"display_name": "Audio Player"
+			},
+			"node": {
+				"class_name": "AudioPlayer",
+				"contents_type": "Job",
+				"always_execute": true,
+				"pins": [
+					{
+						"name": "Input",
+						"type_name": "nos.sys.vulkan.Buffer",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+					},
+					{
+						"name": "InputAudioPacketDescriptor",
+						"type_name": "nos.audio.AudioPacketDescriptor",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+					},
+					{
+						"name": "TargetSampleRate",
+						"type_name": "uint",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": 48000
+					},
+					{
+						"name": "SoundBoost",
+						"type_name": "float",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": 1.0
+					},
+					{
+						"name": "OutputAudioPacketDescriptor",
+						"type_name": "nos.audio.AudioPacketDescriptor",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					},
+					{
+						"name": "Output",
+						"type_name": "nos.sys.vulkan.Buffer",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					}
+				]
+			}
+		}
+	]
+}

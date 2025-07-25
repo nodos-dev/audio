@@ -1,0 +1,149 @@
+// Copyright MediaZ Teknoloji A.S. All Rights Reserved.
+
+#include <Nodos/Plugin.hpp>
+
+#include <nosVulkanSubsystem/Helpers.hpp>
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+#include "Audio_generated.h"
+
+namespace nos::audio
+{
+struct AudioPlayerNode : NodeContext
+{
+	nosResult OnCreate(nosFbNodePtr) override { return NOS_RESULT_SUCCESS; }
+
+	void OnPathStart() override
+	{
+		AccumulatedSampleNumerator = 0;
+		LastSampleTime = 0;
+		LastSampleTimeFract = 0.0f;
+	}
+
+	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	{
+		auto pins = nos::NodeExecuteParams(params);
+		auto inputBuf = pins.GetPinData<vkss::BufferPinData>(NOS_NAME("Input"));
+		
+		auto& inputPacketDesc = *pins.GetPinData<AudioPacketDescriptor>(NOS_NAME("InputAudioPacketDescriptor"));
+		auto& soundBoost = *pins.GetPinData<float>(NOS_NAME("SoundBoost"));
+		auto& targetSampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("TargetSampleRate"));
+		auto inputSampleRate = inputPacketDesc.sample_rate();
+		// Only support fixed step timing
+		if (pins.TimingMode != NOS_EXECUTION_TIMING_MODE_FIXED_STEP)
+		{
+			return NOS_RESULT_FAILED;
+		}
+
+		// Check for invalid timing values
+		if (pins.FixedStepTiming.DeltaSeconds.y == 0)
+		{
+			return NOS_RESULT_FAILED;
+		}
+
+		uint64_t deltaNumerator = pins.FixedStepTiming.DeltaSeconds.x;
+		uint64_t deltaDenominator = pins.FixedStepTiming.DeltaSeconds.y;
+
+		AccumulatedSampleNumerator += deltaNumerator * static_cast<uint64_t>(targetSampleRate);
+
+		uint32_t numSamples = static_cast<uint32_t>(AccumulatedSampleNumerator / deltaDenominator);
+		AccumulatedSampleNumerator %= deltaDenominator; // Keep remainder for next frame
+
+		// Create or resize audio buffer only if needed (with 1.5x headroom to avoid frequent reallocations)
+		size_t requiredBufferSize = numSamples * sizeof(uint32_t) * inputPacketDesc.channel_count();
+		size_t allocatedBufferSize = OutputAudio ? OutputAudio->Info.Buffer.Size : 0;
+
+		if (!OutputAudio || requiredBufferSize > allocatedBufferSize)
+		{
+			OutputAudio = std::nullopt;
+
+			// Allocate 1.5x the required size to reduce frequency of reallocations
+			size_t newBufferSize = static_cast<size_t>(requiredBufferSize * 1.5f);
+
+			nosBufferInfo audioBufferDesc = {};
+			audioBufferDesc.Size = static_cast<uint32_t>(newBufferSize);
+			audioBufferDesc.Usage = nosBufferUsage(NOS_BUFFER_USAGE_STORAGE_BUFFER | NOS_BUFFER_USAGE_TRANSFER_DST |
+												   NOS_BUFFER_USAGE_TRANSFER_SRC);
+			audioBufferDesc.MemoryFlags =
+				nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE | NOS_MEMORY_FLAGS_FORCE_HOST_MEMORY);
+			audioBufferDesc.ElementType = NOS_BUFFER_ELEMENT_TYPE_INT32;
+			audioBufferDesc.FieldType = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
+
+			OutputAudio = vkss::Resource::Create(audioBufferDesc, "AudioPlayer AudioBuffer");
+			if (!OutputAudio)
+				return NOS_RESULT_FAILED;
+
+			nos::Buffer audioPacketPinData = OutputAudio->ToPinData();
+			SetPinValue(NOS_NAME("Output"), audioPacketPinData);
+		}
+
+		nosResourceShareInfo& audioBufDesc = *OutputAudio;
+		int32_t* outAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(&audioBufDesc));
+		int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(&inputBuf));
+		if (!outAudioSamples)
+		{
+			return NOS_RESULT_FAILED;
+		}
+
+		for (uint32_t i = 0; i < numSamples; ++i)
+		{
+			float targetSampleTimeFract = 1.0f / static_cast<float>(targetSampleRate) + LastSampleTimeFract;
+			uint64_t targetSampleTime = LastSampleTime + static_cast<uint64_t>(targetSampleTimeFract);
+			targetSampleTimeFract = std::fmod(targetSampleTimeFract, 1.0f);
+			LastSampleTime = targetSampleTime;
+			LastSampleTimeFract = targetSampleTimeFract;
+
+			float sourceSampleIndexFract = targetSampleTimeFract * inputSampleRate;
+			uint64_t sourceSampleIndex = targetSampleTime * inputSampleRate + static_cast<uint64_t>(sourceSampleIndexFract);
+			sourceSampleIndex %= inputPacketDesc.num_samples();
+			// This will be used to interpolate the sample
+			sourceSampleIndexFract = std::fmod(sourceSampleIndexFract, 1.0f);
+
+			for (auto channel = 0; channel < inputPacketDesc.channel_count(); ++channel)
+			{
+				auto constexpr shiftedint24ToFloat = [](int32_t sample) -> float {
+					int32_t sampleShifted = sample >> 8; // Convert 32-bit to 24-bit by shifting right
+					return static_cast<float>(sampleShifted) / 8388607.0f; // Normalize to [-1.0, 1.0]
+				};
+
+				int32_t sample1 = inputAudioSamples[sourceSampleIndex * inputPacketDesc.channel_count() + channel];
+				uint64_t nextSampleIndex = (sourceSampleIndex + 1) % inputPacketDesc.num_samples();
+				int32_t sample2 = inputAudioSamples[nextSampleIndex * inputPacketDesc.channel_count()  + channel];
+				float sample1Shifted = shiftedint24ToFloat(sample1);
+				float sample2Shifted = shiftedint24ToFloat(sample2);
+				float interpolated = std::lerp(sample1Shifted, sample2Shifted, sourceSampleIndexFract) * soundBoost;
+
+				int32_t sample24bit = static_cast<int32_t>(interpolated * 8388607.0f);
+				sample24bit = std::max(-8388608, std::min(8388607, sample24bit));
+				int32_t sampleShifted = sample24bit << 8; // Shift to store as 32-bit with 24-bit sample in MSB
+
+				outAudioSamples[i * inputPacketDesc.channel_count() + channel] =
+					sampleShifted; // Store as 32-bit with 24-bit sample in MSB
+			}
+		}
+
+		AudioPacketDescriptor audioPacketDesc(
+			targetSampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, sizeof(int32_t), inputPacketDesc.channel_count());
+
+		// Set output pin values
+		SetPinValue(NOS_NAME("OutputAudioPacketDescriptor"), audioPacketDesc);
+
+		return NOS_RESULT_SUCCESS;
+	}
+
+	std::optional<vkss::Resource> OutputAudio = std::nullopt;
+	uint64_t AccumulatedSampleNumerator; // Accumulates fractional samples as integer numerator
+	uint64_t LastSampleTime = 0;
+	float LastSampleTimeFract = 0.0f;
+};
+
+nosResult RegisterAudioPlayerNode(nosNodeFunctions* fn)
+{
+	NOS_BIND_NODE_CLASS(NOS_NAME("AudioPlayer"), AudioPlayerNode, fn);
+	return NOS_RESULT_SUCCESS;
+}
+} // namespace nos::audio

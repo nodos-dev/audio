@@ -15,10 +15,14 @@ namespace nos::audio
 enum class Nodes : int
 {
 	SineWave,
+	ReadAudioFile,
+	AudioPlayer,
 	Count
 };
 
 nosResult RegisterSineWaveNode(nosNodeFunctions*);
+nosResult RegisterReadAudioFileNode(nosNodeFunctions*);
+nosResult RegisterAudioPlayerNode(nosNodeFunctions*);
 
 struct AudioPluginFunctions : nos::PluginFunctions
 {
@@ -30,6 +34,8 @@ struct AudioPluginFunctions : nos::PluginFunctions
 			return NOS_RESULT_SUCCESS;
 
 		NOS_RETURN_ON_FAILURE(RegisterSineWaveNode(outList[(int)Nodes::SineWave]))
+		NOS_RETURN_ON_FAILURE(RegisterReadAudioFileNode(outList[(int)Nodes::ReadAudioFile]))
+		NOS_RETURN_ON_FAILURE(RegisterAudioPlayerNode(outList[(int)Nodes::AudioPlayer]))
 		return NOS_RESULT_SUCCESS;
 	}
 };
