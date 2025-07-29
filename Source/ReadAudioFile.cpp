@@ -7,6 +7,10 @@
 
 #include "Audio_generated.h"
 
+// AudioFile.h defines it without checking if it was defined before.
+#ifdef NOMINMAX
+#undef NOMINMAX
+#endif
 #include <AudioFile.h>
 
 namespace nos::audio
@@ -17,26 +21,28 @@ struct ReadAudioFileNode : NodeContext
 	{
 		auto pins = nos::NodeExecuteParams(params);
 		AudioFile<int32_t> audioFile{};
-		if (!audioFile.load(pins.GetPinData<const char*>(NOS_NAME("Path"))))
+		auto path = pins.GetPinData<const char*>(NOS_NAME("Path"));
+		if (!audioFile.load(path))
 		{
-			nosEngine.LogE("Failed to load audio file: %s", pins.GetPinData<const char*>(NOS_NAME("Path")));
+			nosEngine.LogE("Failed to load audio file: %s", path);
 			return NOS_RESULT_FAILED;
 		}
 		std::stringstream ss;
-		ss << "|======================================|" << std::endl
-		   << "Num Channels: " << audioFile.getNumChannels() << std::endl
-		   << "Num Samples Per Channel: " << audioFile.getNumSamplesPerChannel() << std::endl
-		   << "Sample Rate: " << audioFile.getSampleRate() << std::endl
-		   << "Bit Depth: " << audioFile.getBitDepth() << std::endl
-		   << "Length in Seconds: " << audioFile.getLengthInSeconds() << std::endl
-		   << "|======================================|" << std::endl;
+		ss << "Audio file read from " << path << std::endl
+		   << "\t|======================================| " << std::endl
+		   << "\t| Num Channels: " << audioFile.getNumChannels() << std::endl
+		   << "\t| Num Samples Per Channel: " << audioFile.getNumSamplesPerChannel() << std::endl
+		   << "\t| Sample Rate: " << audioFile.getSampleRate() << std::endl
+		   << "\t| Bit Depth: " << audioFile.getBitDepth() << std::endl
+		   << "\t| Length in Seconds: " << audioFile.getLengthInSeconds() << std::endl
+		   << "\t|======================================|" << std::endl;
 		nosEngine.LogI("%s", ss.str().c_str());
 
 		auto channelCount = *pins.GetPinData<uint32_t>(NOS_NAME("ChannelCount"));
 
 		auto bufOpt = vkss::Resource::Create(
 			nosBufferInfo{
-				.Size = audioFile.getNumSamplesPerChannel() * channelCount * sizeof(int32_t),
+				.Size = uint32_t(audioFile.getNumSamplesPerChannel() * channelCount * sizeof(int32_t)),
 				.Usage = NOS_BUFFER_USAGE_TRANSFER_SRC,
 				.MemoryFlags = nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE | NOS_MEMORY_FLAGS_FORCE_HOST_MEMORY),
 			},
