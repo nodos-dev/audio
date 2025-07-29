@@ -1,0 +1,16 @@
+{
+    "shaders": [
+        {
+            "key": "AUDIO_OSCILLOSCOPE_FRAG",
+            "path": "Shaders/AudioOscilloscope.frag",
+            "stage": "FRAGMENT",
+            "lang": "GLSL"
+        }
+    ],
+    "passes": [
+        {
+            "key": "AUDIO_OSCILLOSCOPE_PASS",
+            "shader": "AUDIO_OSCILLOSCOPE_FRAG"
+        }
+    ]
+}

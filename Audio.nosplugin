@@ -14,5 +14,12 @@
 		],
 		"category": "Audio"
 	},
-	"binary_path": "Binaries/nosAudio"
+	"binary_path": "Binaries/nosAudio",
+	"plugin_options": [
+		{
+			"plugin": "nos.sys.vulkan",
+			"type": "nos.sys.vulkan.Resources",
+			"path": "Config/Resources.json"
+		}
+	]
 }
