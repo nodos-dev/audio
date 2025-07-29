@@ -10,6 +10,7 @@
 #endif
 
 #include "Audio_generated.h"
+#include "AudioConversions.hpp"
 
 namespace nos::audio
 {
@@ -92,9 +93,7 @@ struct SineWave : NodeContext
 			LastSampleTime = sampleTime;
 			float floatSample = waveAmplitude * std::sin(2.0f * static_cast<float>(M_PI) * sampleTime);
 			
-			int32_t sample24bit = static_cast<int32_t>(floatSample * 8388607.0f);
-			sample24bit = std::max(-8388608, std::min(8388607, sample24bit));
-			int32_t sampleShifted = sample24bit << 8;
+			int32_t sampleShifted = FloatToShiftedInt24(floatSample);
 			for (auto channel = 0; channel < channelCount; ++channel)
 			{
 				audioSamples[i * channelCount + channel] = sampleShifted; // Store as 32-bit with 24-bit sample in MSB
@@ -105,7 +104,7 @@ struct SineWave : NodeContext
 		CurrentSampleIndex += numSamples;
 		
 		AudioPacketDescriptor audioPacketDesc(
-			sampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, 32, channelCount);
+			sampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, 4, channelCount);
 		
 		// Set output pin values
 		SetPinValue(NOS_NAME("AudioPacketDescriptor"), audioPacketDesc);

@@ -105,24 +105,16 @@ struct AudioPlayerNode : NodeContext
 
 			for (auto channel = 0; channel < inputPacketDesc.channel_count(); ++channel)
 			{
-				auto constexpr shiftedint24ToFloat = [](int32_t sample) -> float {
-					int32_t sampleShifted = sample >> 8; // Convert 32-bit to 24-bit by shifting right
-					return static_cast<float>(sampleShifted) / 8388607.0f; // Normalize to [-1.0, 1.0]
-				};
-
 				int32_t sample1 = inputAudioSamples[sourceSampleIndex * inputPacketDesc.channel_count() + channel];
 				uint64_t nextSampleIndex = (sourceSampleIndex + 1) % inputPacketDesc.num_samples();
 				int32_t sample2 = inputAudioSamples[nextSampleIndex * inputPacketDesc.channel_count()  + channel];
-				float sample1Shifted = shiftedint24ToFloat(sample1);
-				float sample2Shifted = shiftedint24ToFloat(sample2);
+				float sample1Shifted = ShiftedInt24ToFloat(sample1);
+				float sample2Shifted = ShiftedInt24ToFloat(sample2);
 				float interpolated = std::lerp(sample1Shifted, sample2Shifted, sourceSampleIndexFract) * soundBoost;
 
-				int32_t sample24bit = static_cast<int32_t>(interpolated * 8388607.0f);
-				sample24bit = std::max(-8388608, std::min(8388607, sample24bit));
-				int32_t sampleShifted = sample24bit << 8; // Shift to store as 32-bit with 24-bit sample in MSB
+				int32_t sampleShifted = FloatToShiftedInt24(interpolated);
 
-				outAudioSamples[i * inputPacketDesc.channel_count() + channel] =
-					sampleShifted; // Store as 32-bit with 24-bit sample in MSB
+				outAudioSamples[i * inputPacketDesc.channel_count() + channel] = sampleShifted;
 			}
 		}
 

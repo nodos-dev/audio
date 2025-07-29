@@ -1,50 +1,57 @@
 {
 	"nodes": [
 		{
-			"class_name": "AudioPlayer",
+			"class_name": "Resample",
 			"menu_info": {
 				"category": "Audio",
-				"display_name": "Audio Player"
+				"display_name": "Resample"
 			},
 			"node": {
-				"class_name": "AudioPlayer",
+				"class_name": "Resample",
+				"display_name": "Audio Resample",
 				"contents_type": "Job",
-				"always_execute": true,
+				"description": "Resamples audio to different sample rate and channel count",
 				"pins": [
 					{
 						"name": "InputAudioPacketDescriptor",
+						"display_name": "In Audio Packet Descriptor",
 						"type_name": "nos.audio.AudioPacketDescriptor",
 						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+						"can_show_as": "INPUT_PIN_ONLY"
 					},
 					{
-						"name": "Input",
+						"name": "InputAudio",
+						"display_name": "In Audio Packet",
 						"type_name": "nos.sys.vulkan.Buffer",
 						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+						"can_show_as": "INPUT_PIN_ONLY"
 					},
 					{
-						"name": "TargetSampleRate",
+						"name": "OutputSampleRate",
+						"display_name": "Out Sample Rate",
 						"type_name": "uint",
 						"show_as": "PROPERTY",
 						"can_show_as": "INPUT_PIN_OR_PROPERTY",
 						"data": 48000
 					},
 					{
-						"name": "SoundBoost",
-						"type_name": "float",
+						"name": "OutputChannelCount",
+						"display_name": "Out Channel Count",
+						"type_name": "uint",
 						"show_as": "PROPERTY",
 						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 1.0
+						"data": 2
 					},
 					{
 						"name": "OutputAudioPacketDescriptor",
+						"display_name": "Out Audio Packet Descriptor",
 						"type_name": "nos.audio.AudioPacketDescriptor",
 						"show_as": "OUTPUT_PIN",
 						"can_show_as": "OUTPUT_PIN_ONLY"
 					},
 					{
-						"name": "Output",
+						"name": "OutputAudio",
+						"display_name": "Out Audio Packet",
 						"type_name": "nos.sys.vulkan.Buffer",
 						"show_as": "OUTPUT_PIN",
 						"can_show_as": "OUTPUT_PIN_ONLY"

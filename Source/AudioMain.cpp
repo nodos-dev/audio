@@ -17,12 +17,16 @@ enum class Nodes : int
 	SineWave,
 	ReadAudioFile,
 	AudioPlayer,
+	UnpackAudioBuffer,
+	Resample,
 	Count
 };
 
 nosResult RegisterSineWaveNode(nosNodeFunctions*);
 nosResult RegisterReadAudioFileNode(nosNodeFunctions*);
 nosResult RegisterAudioPlayerNode(nosNodeFunctions*);
+nosResult RegisterUnpackAudioBufferNode(nosNodeFunctions*);
+nosResult RegisterResampleNode(nosNodeFunctions*);
 
 struct AudioPluginFunctions : nos::PluginFunctions
 {
@@ -36,6 +40,8 @@ struct AudioPluginFunctions : nos::PluginFunctions
 		NOS_RETURN_ON_FAILURE(RegisterSineWaveNode(outList[(int)Nodes::SineWave]))
 		NOS_RETURN_ON_FAILURE(RegisterReadAudioFileNode(outList[(int)Nodes::ReadAudioFile]))
 		NOS_RETURN_ON_FAILURE(RegisterAudioPlayerNode(outList[(int)Nodes::AudioPlayer]))
+		NOS_RETURN_ON_FAILURE(RegisterUnpackAudioBufferNode(outList[(int)Nodes::UnpackAudioBuffer]))
+		NOS_RETURN_ON_FAILURE(RegisterResampleNode(outList[(int)Nodes::Resample]))
 		return NOS_RESULT_SUCCESS;
 	}
 };
