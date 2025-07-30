@@ -1,0 +1,82 @@
+name: Build
+
+on:
+  push:
+    branches: [ dev ]
+  workflow_dispatch:
+    inputs:
+      publish_mode:
+        description: 'Publish Mode'
+        required: true
+        default: 'Only Changed'
+        type: choice
+        options:
+          - Only Changed
+          - All Modules
+          - None
+      nodos_sdk_version:
+        description: 'Nodos SDK Version'
+        required: false
+        default: ''
+        type: string
+      clean:
+        description: 'Clean build'
+        required: false
+        default: false
+        type: boolean
+      sign_binaries:
+        description: 'Sign binaries'
+        required: false
+        default: false
+        type: boolean
+      linux:
+        description: 'Release for Linux'
+        required: false
+        default: true
+        type: boolean
+      windows:
+        description: 'Release for Windows'
+        required: false
+        default: true
+        type: boolean
+
+run-name: >-
+  ${{ ((github.event_name == 'push') && format('Build Only: {0}', github.event.head_commit.message)) ||
+      (github.event.inputs.publish_mode == 'Only Changed') && 'Build & Release' || 
+      (github.event.inputs.publish_mode == 'All Modules') && 'Build & Release (All)' ||
+      'Build Only' }}
+
+concurrency:
+  group: single
+  cancel-in-progress: false
+
+jobs:
+  set-build-number:
+    name: Set Build Number
+    runs-on: self-hosted
+    outputs:
+      build_number: ${{ steps.offset-build-number.outputs.build_number }}
+    steps:
+      - name: Offset Build Number
+        id: offset-build-number
+        shell: bash
+        run: |
+          BUILD_NUMBER=$(( ${{ github.run_number }} + 0 ))
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+
+  call-release-modules:
+    name: Build
+    needs: set-build-number
+    uses: nodos-dev/actions/.github/workflows/modules.yml@main
+    secrets:
+      CI_TOKEN: ${{ secrets.CI_TOKEN }}
+      SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+    with:
+      ref_name: ${{ github.ref_name }}
+      publish_mode: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.publish_mode || 'None' }}
+      nodos_sdk_version: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.nodos_sdk_version || '' }}
+      clean: ${{ github.event_name == 'workflow_dispatch' && fromJson(github.event.inputs.clean) || false }}
+      build_number: ${{ needs.set-build-number.outputs.build_number }}
+      sign_binaries: ${{github.event_name == 'workflow_dispatch' && fromJson(github.event.inputs.sign_binaries) || false }}
+      linux: ${{ github.event_name == 'workflow_dispatch' && fromJson(github.event.inputs.linux) || github.event_name == 'push'}}
+      windows: ${{ github.event_name == 'workflow_dispatch' && fromJson(github.event.inputs.windows) || github.event_name == 'push' }}
