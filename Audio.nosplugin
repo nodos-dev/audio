@@ -2,7 +2,7 @@
 	"info": {
 		"id": {
 			"name": "nos.audio",
-			"version": "0.1.0"
+			"version": "0.1.1"
 		},
 		"description": "Nodos plugin for audio processing.",
 		"display_name": "Audio",
