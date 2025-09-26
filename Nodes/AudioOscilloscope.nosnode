@@ -1,135 +1,140 @@
 {
-	"nodes": [
-		{
-			"class_name": "AudioOscilloscope",
-			"menu_info": {
-				"category": "Audio",
-				"display_name": "Audio Oscilloscope"
-			},
-			"node": {
-				"class_name": "AudioOscilloscope",
-				"contents_type": "Job",
-				"description": "Displays audio amplitude over time in an oscilloscope-style visualization. Shows RMS levels across time bins with customizable thickness, amplitude, and color parameters.",
-				"pins": [
-					{
-						"name": "InputAudioPacketDescriptor",
-						"display_name": "Audio Packet Descriptor",
-						"type_name": "nos.audio.AudioPacketDescriptor",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY",
-						"description": "Audio packet descriptor containing sample rate, channel count, etc."
-					},
-					{
-						"name": "InputAudio",
-						"display_name": "Audio Input",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY",
-						"description": "Raw audio data buffer."
-					},
-					{
-						"name": "Thickness",
-						"display_name": "Thickness",
-						"type_name": "float",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 0.002,
-						"min": 0.0001,
-						"max": 0.01,
-						"description": "Thickness of the oscilloscope trace line."
-					},
-					{
-						"name": "FrameAverage",
-						"display_name": "Frame Average",
-						"type_name": "uint",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 1,
-						"min": 1,
-						"max": 10,
-						"description": "Number of frames to average for oscilloscope display."
-					},
-					{
-						"name": "Amplitude",
-						"display_name": "Amplitude",
-						"type_name": "float",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 0.2,
-						"min": 0.01,
-						"max": 1.0,
-						"description": "Vertical amplitude scaling of the oscilloscope trace."
-					},
-					{
-						"name": "Intensity",
-						"display_name": "Intensity",
-						"type_name": "float",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 1.0,
-						"min": 0.1,
-						"max": 3.0,
-						"description": "Overall brightness/intensity of the oscilloscope display."
-					},
-					{
-						"name": "Color",
-						"display_name": "Color",
-						"type_name": "nos.fb.vec4",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": {
-							"x": 0.32,
-							"y": 0.81,
-							"z": 0.36,
-							"w": 1.0
-						},
-						"visualizer": { "type": "COLOR_PICKER" },
-						"step": 0.01,
-						"description": "Color of the oscilloscope trace."
-					},
-					{
-						"name": "AudioScale",
-						"display_name": "Audio Scale",
-						"type_name": "float",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 3.0,
-						"min": 0.1,
-						"max": 20.0,
-						"description": "Scaling factor for audio data sensitivity."
-					},
-					{
-						"name": "GlowIntensity",
-						"display_name": "Glow Intensity",
-						"type_name": "float",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 0.3,
-						"min": 0.0,
-						"max": 1.0,
-						"description": "Intensity of the glow effect around the oscilloscope trace."
-					},
-					{
-						"name": "GlowFalloff",
-						"display_name": "Glow Falloff",
-						"type_name": "float",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 16.0,
-						"min": 1.0,
-						"max": 50.0,
-						"description": "Controls how quickly the glow decreases with distance. Higher values create tighter glow."
-					},
-					{
-						"name": "Output",
-						"display_name": "Output",
-						"type_name": "nos.sys.vulkan.Texture",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY",
-						"description": "Oscilloscope visualization output."
-					}
-				]
-			}
-		}
-	]
+    "nodes": [
+        {
+            "class_name": "AudioOscilloscope",
+            "menu_info": {
+                "category": "Audio",
+                "display_name": "Audio Oscilloscope"
+            },
+            "node": {
+                "class_name": "AudioOscilloscope",
+                "contents_type": "Job",
+                "description": "Displays audio amplitude over time in an oscilloscope-style visualization. Shows RMS levels across time bins with customizable thickness, amplitude, and color parameters.",
+                "pins": [
+                    {
+                        "name": "InputAudioPacketDescriptor",
+                        "display_name": "Audio Packet Descriptor",
+                        "type_name": "nos.audio.AudioPacketDescriptor",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY",
+                        "description": "Audio packet descriptor containing sample rate, channel count, etc."
+                    },
+                    {
+                        "name": "InputAudio",
+                        "display_name": "Audio Input",
+                        "type_name": "nos.sys.vulkan.Buffer",
+                        "show_as": "INPUT_PIN",
+                        "can_show_as": "INPUT_PIN_ONLY",
+                        "description": "Raw audio data buffer."
+                    },
+                    {
+                        "name": "Thickness",
+                        "display_name": "Thickness",
+                        "type_name": "float",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": 0.002,
+                        "min": 0.0001,
+                        "max": 0.01,
+                        "description": "Thickness of the oscilloscope trace line."
+                    },
+                    {
+                        "name": "FrameAverage",
+                        "display_name": "Frame Average",
+                        "type_name": "uint",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": 1,
+                        "min": 1,
+                        "max": 10,
+                        "description": "Number of frames to average for oscilloscope display."
+                    },
+                    {
+                        "name": "Amplitude",
+                        "display_name": "Amplitude",
+                        "type_name": "float",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": 0.2,
+                        "min": 0.01,
+                        "max": 1.0,
+                        "description": "Vertical amplitude scaling of the oscilloscope trace."
+                    },
+                    {
+                        "name": "Intensity",
+                        "display_name": "Intensity",
+                        "type_name": "float",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": 1.0,
+                        "min": 0.1,
+                        "max": 3.0,
+                        "description": "Overall brightness/intensity of the oscilloscope display."
+                    },
+                    {
+                        "name": "Color",
+                        "display_name": "Color",
+                        "type_name": "nos.fb.vec4",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": {
+                            "x": 0.32,
+                            "y": 0.81,
+                            "z": 0.36,
+                            "w": 1.0
+                        },
+                        "visualizers": [
+                            {
+                                "visualizer_subfield_path": "",
+                                "type": "COLOR_PICKER"
+                            }
+                        ],
+                        "step": 0.01,
+                        "description": "Color of the oscilloscope trace."
+                    },
+                    {
+                        "name": "AudioScale",
+                        "display_name": "Audio Scale",
+                        "type_name": "float",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": 3.0,
+                        "min": 0.1,
+                        "max": 20.0,
+                        "description": "Scaling factor for audio data sensitivity."
+                    },
+                    {
+                        "name": "GlowIntensity",
+                        "display_name": "Glow Intensity",
+                        "type_name": "float",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": 0.3,
+                        "min": 0.0,
+                        "max": 1.0,
+                        "description": "Intensity of the glow effect around the oscilloscope trace."
+                    },
+                    {
+                        "name": "GlowFalloff",
+                        "display_name": "Glow Falloff",
+                        "type_name": "float",
+                        "show_as": "PROPERTY",
+                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                        "data": 16.0,
+                        "min": 1.0,
+                        "max": 50.0,
+                        "description": "Controls how quickly the glow decreases with distance. Higher values create tighter glow."
+                    },
+                    {
+                        "name": "Output",
+                        "display_name": "Output",
+                        "type_name": "nos.sys.vulkan.Texture",
+                        "show_as": "OUTPUT_PIN",
+                        "can_show_as": "OUTPUT_PIN_ONLY",
+                        "description": "Oscilloscope visualization output."
+                    }
+                ]
+            }
+        }
+    ]
 }
