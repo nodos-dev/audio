@@ -31,14 +31,12 @@ struct AudioOscilloscopeNode : NodeContext
         StartTime = std::chrono::high_resolution_clock::now();
     }
     
-    nosResult ExecuteNode(nosNodeExecuteParams* params) override
+    nosResult ExecuteNode(NodeExecuteParams const& pins) override
     {
-        auto pins = nos::NodeExecuteParams(params);
-        
         // Get inputs
-        auto inputAudioBuf = pins.GetPinData<vkss::BufferPinData>(NOS_NAME("InputAudio"));
+        auto inputAudioBuf = pins.GetPinObject<sys::vulkan::Buffer>(NOS_NAME("InputAudio"));
         auto& inputPacketDesc = *pins.GetPinData<AudioPacketDescriptor>(NOS_NAME("InputAudioPacketDescriptor"));
-        auto outputTexture = vkss::DeserializeTextureInfo(pins[NOS_NAME("Output")].Data->Data);
+        auto outputTexture = pins.GetPinObject<sys::vulkan::Texture>(NOS_NAME("Output"));
         
         auto& thickness = *pins.GetPinData<float>(NOS_NAME("Thickness"));
         auto& amplitude = *pins.GetPinData<float>(NOS_NAME("Amplitude"));
@@ -50,7 +48,7 @@ struct AudioOscilloscopeNode : NodeContext
         auto& frameAverage = *pins.GetPinData<uint32_t>(NOS_NAME("FrameAverage"));
 
         // Map input audio buffer
-        int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(&inputAudioBuf));
+        int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(inputAudioBuf));
         if (!inputAudioSamples)
             return NOS_RESULT_FAILED;
 
@@ -83,17 +81,16 @@ struct AudioOscilloscopeNode : NodeContext
             }
             CurrentFrameIndex = 0;
         }
-        if (!ScopeTexture || ScopeTexture->Info.Texture.Width != scopeTexSize)
+        if (!ScopeTexture || sys::vulkan::GetResourceInfo(ScopeTexture)->Width != scopeTexSize)
         {
             nosTextureInfo texInfo = {};
             texInfo.Width = scopeTexSize;
             texInfo.Height = 1;
             texInfo.Format = NOS_FORMAT_R32_SFLOAT;
-            texInfo.Filter = NOS_TEXTURE_FILTER_LINEAR;
             texInfo.Usage = nosImageUsage(NOS_IMAGE_USAGE_SAMPLED | NOS_IMAGE_USAGE_TRANSFER_DST);
             texInfo.FieldType = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
             
-            ScopeTexture = vkss::Resource::Create(texInfo, "AudioOscilloscope TraceTexture");
+            ScopeTexture = sys::vulkan::CreateTexture(texInfo, "AudioOscilloscope TraceTexture");
             if (!ScopeTexture)
                 return NOS_RESULT_FAILED;
         }
@@ -145,7 +142,7 @@ struct AudioOscilloscopeNode : NodeContext
         nosVulkan->Begin(&beginParams);
         
         nosVec2u extent = {scopeTexSize, 1};
-        nosResult loadResult = nosVulkan->ImageLoad(cmd, scopeData.data(), extent, NOS_FORMAT_R32_SFLOAT, &ScopeTexture.value(), nullptr);
+        nosResult loadResult = nosVulkan->ImageLoad(cmd, scopeData.data(), extent, NOS_FORMAT_R32_SFLOAT, ScopeTexture.Handle, NOS_TEXTURE_FILTER_LINEAR);
         if (loadResult != NOS_RESULT_SUCCESS)
         {
             nosVulkan->End(cmd, nullptr);
@@ -156,14 +153,14 @@ struct AudioOscilloscopeNode : NodeContext
         nosVulkan->End(cmd, nullptr);
 
         std::vector<nosShaderBinding> bindings = {
-            vkss::ShaderBinding(NOS_NAME("TraceData"), &ScopeTexture.value()),
-            vkss::ShaderBinding(NOS_NAME("Thickness"), thickness),
-            vkss::ShaderBinding(NOS_NAME("Amplitude"), amplitude),
-            vkss::ShaderBinding(NOS_NAME("Intensity"), intensity),
-            vkss::ShaderBinding(NOS_NAME("Color"), color),
-            vkss::ShaderBinding(NOS_NAME("AudioScale"), audioScale),
-            vkss::ShaderBinding(NOS_NAME("GlowIntensity"), glowIntensity),
-            vkss::ShaderBinding(NOS_NAME("GlowFalloff"), glowFalloff)
+            sys::vulkan::ShaderTextureBinding(NOS_NAME("TraceData"), ScopeTexture, NOS_TEXTURE_FILTER_LINEAR),
+            sys::vulkan::ShaderDataBinding(NOS_NAME("Thickness"), thickness),
+            sys::vulkan::ShaderDataBinding(NOS_NAME("Amplitude"), amplitude),
+            sys::vulkan::ShaderDataBinding(NOS_NAME("Intensity"), intensity),
+            sys::vulkan::ShaderDataBinding(NOS_NAME("Color"), color),
+            sys::vulkan::ShaderDataBinding(NOS_NAME("AudioScale"), audioScale),
+            sys::vulkan::ShaderDataBinding(NOS_NAME("GlowIntensity"), glowIntensity),
+            sys::vulkan::ShaderDataBinding(NOS_NAME("GlowFalloff"), glowFalloff)
         };
 
         nosRunPassParams passParams{
@@ -191,7 +188,7 @@ struct AudioOscilloscopeNode : NodeContext
         return NOS_RESULT_SUCCESS;
     }
 
-    std::optional<vkss::Resource> ScopeTexture = std::nullopt;
+    TypedObjectRef<sys::vulkan::Texture> ScopeTexture;
     std::chrono::high_resolution_clock::time_point StartTime;
     
     // Moving average frame history

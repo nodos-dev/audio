@@ -24,11 +24,10 @@ struct UnpackAudioBuffer : NodeContext
 	void OnPathStart() override
 	{
 	}
-	
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+
+	nosResult ExecuteNode(NodeExecuteParams const& pins) override
 	{
-		auto pins = nos::NodeExecuteParams(params);
-		auto inputBuf = pins.GetPinData<vkss::BufferPinData>(NOS_NAME("PrefixedAudioBuffer"));
+		auto inputBuf = pins.GetPinObject<sys::vulkan::Buffer>(NOS_NAME("PrefixedAudioBuffer"));
 
 		// Wait GPU
 		nosCmd cmd{};
@@ -39,7 +38,7 @@ struct UnpackAudioBuffer : NodeContext
 		};
 		nosVulkan->Begin(&beginParams);
 
-		nosGPUEvent waitHandle{};
+		nosVkGPUEvent waitHandle{};
 		nosCmdEndParams endParams{
 			.ForceSubmit = NOS_TRUE,
 			.OutGPUEventHandle = &waitHandle
@@ -49,7 +48,7 @@ struct UnpackAudioBuffer : NodeContext
 		nosVulkan->WaitGpuEvent(&waitHandle, UINT64_MAX);
 
 		// Map the input buffer to read the prefixed data
-		uint8_t* inputData = reinterpret_cast<uint8_t*>(nosVulkan->Map(&inputBuf));
+		uint8_t* inputData = nosVulkan->Map(inputBuf);
 		if (!inputData)
 			return NOS_RESULT_SUCCESS;
 
@@ -66,14 +65,14 @@ struct UnpackAudioBuffer : NodeContext
 		
 		// Create or resize audio buffer only if needed (with 1.1x headroom to avoid frequent reallocations)
 		size_t requiredBufferSize = std::max(size_t(numSamples * sizeof(uint32_t) * channelCount), size_t(1000));
-		size_t allocatedBufferSize = OutputAudioPacket ? OutputAudioPacket->Info.Buffer.Size : 0;
+		size_t allocatedBufferSize = OutputAudioPacket ? sys::vulkan::GetResourceInfo(OutputAudioPacket)->Size : 0;
 		
 		if (!OutputAudioPacket || requiredBufferSize > allocatedBufferSize)
 		{
-			OutputAudioPacket = std::nullopt;
+			OutputAudioPacket = {};
 			
 			// Allocate 1.1x the required size to reduce frequency of reallocations
-			size_t newBufferSize = static_cast<size_t>(requiredBufferSize * 1.1f);
+			size_t newBufferSize = requiredBufferSize * 1.1f;
 			
 			nosBufferInfo audioBufferDesc = {};
 			audioBufferDesc.Size = static_cast<uint32_t>(newBufferSize);
@@ -82,16 +81,14 @@ struct UnpackAudioBuffer : NodeContext
 			audioBufferDesc.ElementType = NOS_BUFFER_ELEMENT_TYPE_INT32;
 			audioBufferDesc.FieldType = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
 			
-			OutputAudioPacket = vkss::Resource::Create(audioBufferDesc, "Unpacked Audio Buffer");
+			OutputAudioPacket = sys::vulkan::CreateBuffer(audioBufferDesc, "Unpacked Audio Buffer");
 			if (!OutputAudioPacket)
 				return NOS_RESULT_SUCCESS;
 
-			nos::Buffer audioPacketPinData = OutputAudioPacket->ToPinData();
-			SetPinValue(NOS_NAME("Audio"), audioPacketPinData);
+			SetPinObject(NOS_NAME("Audio"), OutputAudioPacket);
 		}
 		
-		nosResourceShareInfo& audioBufDesc = *OutputAudioPacket;
-		int32_t* outputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(&audioBufDesc));
+		int32_t* outputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(OutputAudioPacket));
 		if (!outputAudioSamples)
 			return NOS_RESULT_SUCCESS;
 		
@@ -114,7 +111,7 @@ struct UnpackAudioBuffer : NodeContext
 		return NOS_RESULT_SUCCESS;
 	}
 
-	std::optional<vkss::Resource> OutputAudioPacket = std::nullopt;
+	TypedObjectRef<sys::vulkan::Buffer> OutputAudioPacket;
 };
 
 nosResult RegisterUnpackAudioBufferNode(nosNodeFunctions* fn)

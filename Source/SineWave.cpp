@@ -28,9 +28,8 @@ struct SineWave : NodeContext
 		AccumulatedSampleNumerator = 0;
 	}
 	
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	nosResult ExecuteNode(NodeExecuteParams const& pins) override
 	{
-		auto pins = nos::NodeExecuteParams(params);
 		auto& waveFrequency = *pins.GetPinData<float>(NOS_NAME("WaveFrequency"));
 		auto& waveAmplitude = *pins.GetPinData<float>(NOS_NAME("WaveAmplitude"));
 		auto& sampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("SampleRate"));
@@ -56,14 +55,14 @@ struct SineWave : NodeContext
 		
 		// Create or resize audio buffer only if needed (with 1.5x headroom to avoid frequent reallocations)
 		size_t requiredBufferSize = numSamples * sizeof(uint32_t) * channelCount;
-		size_t allocatedBufferSize = AudioPacket ? AudioPacket->Info.Buffer.Size : 0;
+		size_t allocatedBufferSize = AudioPacket ? sys::vulkan::GetResourceInfo(AudioPacket)->Size : 0;
 		
 		if (!AudioPacket || requiredBufferSize > allocatedBufferSize)
 		{
-			AudioPacket = std::nullopt;
+			AudioPacket = {};
 			
 			// Allocate 1.5x the required size to reduce frequency of reallocations
-			size_t newBufferSize = static_cast<size_t>(requiredBufferSize * 1.5f);
+			size_t newBufferSize = requiredBufferSize * 1.5f;
 			
 			nosBufferInfo audioBufferDesc = {};
 			audioBufferDesc.Size = static_cast<uint32_t>(newBufferSize);
@@ -72,16 +71,14 @@ struct SineWave : NodeContext
 			audioBufferDesc.ElementType = NOS_BUFFER_ELEMENT_TYPE_INT32;
 			audioBufferDesc.FieldType = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
 			
-			AudioPacket = vkss::Resource::Create(audioBufferDesc, "SineWave AudioBuffer");
+			AudioPacket = sys::vulkan::CreateBuffer(audioBufferDesc, "SineWave AudioBuffer");
 			if (!AudioPacket)
 				return NOS_RESULT_FAILED;
 
-			nos::Buffer audioPacketPinData = AudioPacket->ToPinData();
-			SetPinValue(NOS_NAME("AudioPacket"), audioPacketPinData);
+			SetPinObject(NOS_NAME("AudioPacket"), AudioPacket);
 		}
 		
-		nosResourceShareInfo& audioBufDesc = *AudioPacket;
-		int32_t* audioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(&audioBufDesc));
+		int32_t* audioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(AudioPacket));
 		if (!audioSamples) {
 			return NOS_RESULT_FAILED;
 		}
@@ -112,7 +109,7 @@ struct SineWave : NodeContext
 		return NOS_RESULT_SUCCESS;
 	}
 
-	std::optional<vkss::Resource> AudioPacket = std::nullopt;
+	TypedObjectRef<sys::vulkan::Buffer> AudioPacket;
 	uint64_t CurrentSampleIndex;
 	uint64_t TimeSoFar;
 	uint64_t AccumulatedSampleNumerator; // Accumulates fractional samples as integer numerator
