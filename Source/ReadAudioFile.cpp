@@ -62,13 +62,26 @@ struct ReadAudioFileNode : NodeContext
 			}
 		}
 
-		SetPinObject(NOS_NAME("Out"), bufferObject);
 		AudioPacketDescriptor audioPacketDesc(audioFile.getSampleRate(),
 											  audioFile.getNumSamplesPerChannel(),
 											  BitDepth::AUDIO_BIT_DEPTH_24_BIT,
 											  sizeof(int32_t),
 											  channelCount);
-		SetPinValue(NOS_NAME("OutAudioPacketDescriptor"), audioPacketDesc);
+		ObjectRef descObject{};
+		nosEngine.ObjectAPI->CreatePrimitiveObject(NOS_NAME("nos.audio.AudioPacketDescriptor"), nos::Buffer::From(audioPacketDesc), &descObject.Handle);
+		std::vector<nosCompositeObjectField> fields;
+		fields.push_back(nosCompositeObjectField{
+			.FieldName = NOS_NAME("desc"),
+			.FieldHandle = descObject.Handle,
+		});
+		fields.push_back(nosCompositeObjectField{
+			.FieldName = NOS_NAME("buffer"),
+			.FieldHandle = bufferObject.Handle,
+		});
+
+		ObjectRef audioPacket{};
+		nosEngine.ObjectAPI->CreateCompositeObject(NOS_NAME("nos.audio.AudioPacket"), fields.data(), fields.size(), &audioPacket.Handle);
+		SetPinObject(NOS_NAME("FullAudio"), audioPacket);
 		return NOS_RESULT_SUCCESS;
 	}
 };

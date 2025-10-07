@@ -29,16 +29,11 @@
 						"data": 2
 					},
 					{
-						"name": "OutAudioPacketDescriptor",
-						"type_name": "nos.audio.AudioPacketDescriptor",
+						"name": "FullAudio",
+						"display_name": "Full Audio",
+						"type_name": "nos.audio.AudioPacket",
 						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_OR_PROPERTY"
-					},
-					{
-						"name": "Out",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_OR_PROPERTY"
+						"can_show_as": "OUTPUT_PIN_ONLY"
 					}
 				],
 				"functions": []

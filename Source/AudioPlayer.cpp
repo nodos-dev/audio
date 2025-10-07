@@ -27,9 +27,16 @@ struct AudioPlayerNode : NodeContext
 
 	nosResult ExecuteNode(NodeExecuteParams const& pins) override
 	{
-		auto inputBuf = pins.GetPinObject<sys::vulkan::Buffer>(NOS_NAME("Input"));
+		auto fullAudio = pins.GetPinObject(NOS_NAME("FullAudio"));
 		
-		auto& inputPacketDesc = *pins.GetPinData<AudioPacketDescriptor>(NOS_NAME("InputAudioPacketDescriptor"));
+		ObjectRef desc{}, buf{};
+		nosEngine.ObjectAPI->GetField(fullAudio, NOS_NAME("desc"), &desc.Handle);
+		nosEngine.ObjectAPI->GetField(fullAudio, NOS_NAME("buffer"), &buf.Handle);
+
+		const nosBuffer* descBuf{};
+		nosEngine.ObjectAPI->GetPrimitiveObjectDataView(desc.Handle, &descBuf);
+
+		auto& inputPacketDesc = *static_cast<AudioPacketDescriptor*>(descBuf->Data);
 		auto& soundBoost = *pins.GetPinData<float>(NOS_NAME("SoundBoost"));
 		auto& targetSampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("TargetSampleRate"));
 		auto inputSampleRate = inputPacketDesc.sample_rate();
@@ -53,16 +60,23 @@ struct AudioPlayerNode : NodeContext
 		uint32_t numSamples = static_cast<uint32_t>(AccumulatedSampleNumerator / deltaDenominator);
 		AccumulatedSampleNumerator %= deltaDenominator; // Keep remainder for next frame
 
-		// Create or resize audio buffer only if needed (with 1.5x headroom to avoid frequent reallocations)
+		// Create or resize audio buffer only if needed (with 1.1x headroom to avoid frequent reallocations)
 		size_t requiredBufferSize = numSamples * sizeof(uint32_t) * inputPacketDesc.channel_count();
-		size_t allocatedBufferSize = OutputAudio ? sys::vulkan::GetResourceInfo(OutputAudio)->Size : 0;
+		size_t allocatedBufferSize = 0;
+		if (OutputAudio)
+		{
+			if (auto bufferInfo = sys::vulkan::GetResourceInfo(OutputAudio))
+				allocatedBufferSize = bufferInfo->Size;
+			else
+				NOS_SOFT_CHECK(false, "Failed to get buffer info for existing audio buffer");
+		}
 
 		if (!OutputAudio || requiredBufferSize > allocatedBufferSize)
 		{
 			OutputAudio = {};
 
-			// Allocate 1.5x the required size to reduce frequency of reallocations
-			size_t newBufferSize = requiredBufferSize * 1.5f;
+			// Allocate 1.1x the required size to reduce frequency of reallocations
+			size_t newBufferSize = requiredBufferSize * 1.1f;
 
 			nosBufferInfo audioBufferDesc = {};
 			audioBufferDesc.Size = static_cast<uint32_t>(newBufferSize);
@@ -76,12 +90,10 @@ struct AudioPlayerNode : NodeContext
 			OutputAudio = sys::vulkan::CreateBuffer(audioBufferDesc, "AudioPlayer AudioBuffer");
 			if (!OutputAudio)
 				return NOS_RESULT_FAILED;
-
-			SetPinObject(NOS_NAME("Output"), OutputAudio);
 		}
 
 		int32_t* outAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(OutputAudio));
-		int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(inputBuf));
+		int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(buf));
 		if (!outAudioSamples)
 		{
 			return NOS_RESULT_FAILED;
@@ -119,8 +131,25 @@ struct AudioPlayerNode : NodeContext
 		AudioPacketDescriptor audioPacketDesc(
 			targetSampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, sizeof(int32_t), inputPacketDesc.channel_count());
 
+		ObjectRef outDesc{};
+		nosEngine.ObjectAPI->CreatePrimitiveObject(NOS_NAME("nos.audio.AudioPacketDescriptor"), nos::Buffer::From(audioPacketDesc), &outDesc.Handle);
+		
+		ObjectRef out{};
+		std::vector<nosCompositeObjectField> fields;
+		fields.push_back(nosCompositeObjectField{
+			.FieldName = NOS_NAME("desc"),
+			.FieldHandle = outDesc,
+		});
+		fields.push_back(nosCompositeObjectField{
+			.FieldName = NOS_NAME("buffer"),
+			.FieldHandle = OutputAudio,
+		});
+		nosEngine.ObjectAPI->CreateCompositeObject(NOS_NAME("nos.audio.AudioPacket"), fields.data(), fields.size(), &out.Handle);
+		
+		NOS_SOFT_CHECK(out, "Failed to create output AudioPacket object");
+
 		// Set output pin values
-		SetPinValue(NOS_NAME("OutputAudioPacketDescriptor"), audioPacketDesc);
+		SetPinObject(NOS_NAME("AudioPacket"), out);
 
 		return NOS_RESULT_SUCCESS;
 	}

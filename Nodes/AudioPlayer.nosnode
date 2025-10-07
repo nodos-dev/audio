@@ -12,16 +12,11 @@
 				"always_execute": true,
 				"pins": [
 					{
-						"name": "InputAudioPacketDescriptor",
-						"type_name": "nos.audio.AudioPacketDescriptor",
+						"name": "FullAudio",
+						"display_name": "Full Audio",
+						"type_name": "nos.audio.AudioPacket",
 						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
-					},
-					{
-						"name": "Input",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY"
+						"can_show_as": "INPUT_PIN_ONLY"
 					},
 					{
 						"name": "TargetSampleRate",
@@ -38,14 +33,9 @@
 						"data": 1.0
 					},
 					{
-						"name": "OutputAudioPacketDescriptor",
-						"type_name": "nos.audio.AudioPacketDescriptor",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
-					},
-					{
-						"name": "Output",
-						"type_name": "nos.sys.vulkan.Buffer",
+						"name": "AudioPacket",
+						"display_name": "Audio Packet",
+						"type_name": "nos.audio.AudioPacket",
 						"show_as": "OUTPUT_PIN",
 						"can_show_as": "OUTPUT_PIN_ONLY"
 					}
