@@ -68,19 +68,19 @@ struct ReadAudioFileNode : NodeContext
 											  sizeof(int32_t),
 											  channelCount);
 		ObjectRef descObject{};
-		nosEngine.ObjectAPI->CreatePrimitiveObject(NOS_NAME("nos.audio.AudioPacketDescriptor"), nos::Buffer::From(audioPacketDesc), &descObject.Handle);
+		nosEngine.ObjectAPI->CreatePrimitiveObject(NOS_NAME("nos.audio.AudioPacketDescriptor"), nos::Buffer::From(audioPacketDesc), &descObject.GetStorage());
 		std::vector<nosCompositeObjectField> fields;
 		fields.push_back(nosCompositeObjectField{
 			.FieldName = NOS_NAME("desc"),
-			.FieldHandle = descObject.Handle,
+			.FieldObjectId = descObject,
 		});
 		fields.push_back(nosCompositeObjectField{
 			.FieldName = NOS_NAME("buffer"),
-			.FieldHandle = bufferObject.Handle,
+			.FieldObjectId = bufferObject,
 		});
 
 		ObjectRef audioPacket{};
-		nosEngine.ObjectAPI->CreateCompositeObject(NOS_NAME("nos.audio.AudioPacket"), fields.data(), fields.size(), &audioPacket.Handle);
+		nosEngine.ObjectAPI->CreateCompositeObject(NOS_NAME("nos.audio.AudioPacket"), fields.data(), fields.size(), &audioPacket.GetStorage());
 		SetPinObject(NOS_NAME("FullAudio"), audioPacket);
 		return NOS_RESULT_SUCCESS;
 	}

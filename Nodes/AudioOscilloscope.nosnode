@@ -12,17 +12,9 @@
 				"description": "Displays audio amplitude over time in an oscilloscope-style visualization. Shows RMS levels across time bins with customizable thickness, amplitude, and color parameters.",
 				"pins": [
 					{
-						"name": "InputAudioPacketDescriptor",
-						"display_name": "Audio Packet Descriptor",
-						"type_name": "nos.audio.AudioPacketDescriptor",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY",
-						"description": "Audio packet descriptor containing sample rate, channel count, etc."
-					},
-					{
-						"name": "InputAudio",
-						"display_name": "Audio Input",
-						"type_name": "nos.sys.vulkan.Buffer",
+						"name": "AudioPacket",
+						"display_name": "Audio Packet",
+						"type_name": "nos.audio.AudioPacket",
 						"show_as": "INPUT_PIN",
 						"can_show_as": "INPUT_PIN_ONLY",
 						"description": "Raw audio data buffer."

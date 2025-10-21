@@ -30,11 +30,15 @@ struct AudioPlayerNode : NodeContext
 		auto fullAudio = pins.GetPinObject(NOS_NAME("FullAudio"));
 		
 		ObjectRef desc{}, buf{};
-		nosEngine.ObjectAPI->GetField(fullAudio, NOS_NAME("desc"), &desc.Handle);
-		nosEngine.ObjectAPI->GetField(fullAudio, NOS_NAME("buffer"), &buf.Handle);
+		nosEngine.ObjectAPI->GetField(fullAudio, NOS_NAME("desc"), &desc.GetStorage());
+		nosEngine.ObjectAPI->GetField(fullAudio, NOS_NAME("buffer"), &buf.GetStorage());
+
+		if (!desc || !buf)
+			return NOS_RESULT_FAILURE;
 
 		const nosBuffer* descBuf{};
-		nosEngine.ObjectAPI->GetPrimitiveObjectDataView(desc.Handle, &descBuf);
+		if (NOS_RESULT_SUCCESS != nosEngine.ObjectAPI->GetPrimitiveObjectDataView(desc, &descBuf))
+			return NOS_RESULT_FAILURE;
 
 		auto& inputPacketDesc = *static_cast<AudioPacketDescriptor*>(descBuf->Data);
 		auto& soundBoost = *pins.GetPinData<float>(NOS_NAME("SoundBoost"));
@@ -132,19 +136,19 @@ struct AudioPlayerNode : NodeContext
 			targetSampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, sizeof(int32_t), inputPacketDesc.channel_count());
 
 		ObjectRef outDesc{};
-		nosEngine.ObjectAPI->CreatePrimitiveObject(NOS_NAME("nos.audio.AudioPacketDescriptor"), nos::Buffer::From(audioPacketDesc), &outDesc.Handle);
+		nosEngine.ObjectAPI->CreatePrimitiveObject(NOS_NAME(AudioPacketDescriptor::GetFullyQualifiedName()), nos::Buffer::From(audioPacketDesc), &outDesc.GetStorage());
 		
 		ObjectRef out{};
 		std::vector<nosCompositeObjectField> fields;
 		fields.push_back(nosCompositeObjectField{
 			.FieldName = NOS_NAME("desc"),
-			.FieldHandle = outDesc,
+			.FieldObjectId = outDesc,
 		});
 		fields.push_back(nosCompositeObjectField{
 			.FieldName = NOS_NAME("buffer"),
-			.FieldHandle = OutputAudio,
+			.FieldObjectId = OutputAudio,
 		});
-		nosEngine.ObjectAPI->CreateCompositeObject(NOS_NAME("nos.audio.AudioPacket"), fields.data(), fields.size(), &out.Handle);
+		nosEngine.ObjectAPI->CreateCompositeObject(NOS_NAME(AudioPacket::GetFullyQualifiedName()), fields.data(), fields.size(), &out.GetStorage());
 		
 		NOS_SOFT_CHECK(out, "Failed to create output AudioPacket object");
 

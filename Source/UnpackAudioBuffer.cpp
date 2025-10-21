@@ -38,7 +38,7 @@ struct UnpackAudioBuffer : NodeContext
 		};
 		nosVulkan->Begin(&beginParams);
 
-		nosVkGPUEvent waitHandle{};
+		nosGPUEvent waitHandle{};
 		nosCmdEndParams endParams{
 			.ForceSubmit = NOS_TRUE,
 			.OutGPUEventHandle = &waitHandle
