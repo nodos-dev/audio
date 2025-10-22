@@ -13,16 +13,9 @@
 				"description": "Resamples audio to different sample rate and channel count",
 				"pins": [
 					{
-						"name": "InputAudioPacketDescriptor",
-						"display_name": "In Audio Packet Descriptor",
-						"type_name": "nos.audio.AudioPacketDescriptor",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY"
-					},
-					{
-						"name": "InputAudio",
+						"name": "InputAudioPacket",
 						"display_name": "In Audio Packet",
-						"type_name": "nos.sys.vulkan.Buffer",
+						"type_name": "nos.audio.AudioPacket",
 						"show_as": "INPUT_PIN",
 						"can_show_as": "INPUT_PIN_ONLY"
 					},
@@ -43,16 +36,9 @@
 						"data": 2
 					},
 					{
-						"name": "OutputAudioPacketDescriptor",
-						"display_name": "Out Audio Packet Descriptor",
-						"type_name": "nos.audio.AudioPacketDescriptor",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY"
-					},
-					{
-						"name": "OutputAudio",
+						"name": "OutputAudioPacket",
 						"display_name": "Out Audio Packet",
-						"type_name": "nos.sys.vulkan.Buffer",
+						"type_name": "nos.audio.AudioPacket",
 						"show_as": "OUTPUT_PIN",
 						"can_show_as": "OUTPUT_PIN_ONLY"
 					}

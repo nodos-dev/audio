@@ -28,9 +28,26 @@ struct ResampleNode : NodeContext
 	
 	nosResult ExecuteNode(NodeExecuteParams const& pins) override
 	{
-		auto inputBuf = pins.GetPinObject<sys::vulkan::Buffer>(NOS_NAME("InputAudio"));
+		// Get input audio packet
+		auto inputAudioPacket = pins.GetPinObject<CompositeObjectRef>(NOS_NAME("InputAudioPacket"));
+		if (!inputAudioPacket)
+			return NOS_RESULT_FAILED;
+		
+		// Extract descriptor and buffer from the composite AudioPacket
+		auto descObj = inputAudioPacket.GetField<PrimitiveObjectRef>(NOS_NAME("desc"));
+		if (!descObj)
+			return NOS_RESULT_FAILED;
+		
+		auto descBuffer = descObj->GetPrimitiveDataView();
+		if (!descBuffer)
+			return NOS_RESULT_FAILED;
+		
+		auto& inputPacketDesc = *reinterpret_cast<const AudioPacketDescriptor*>(descBuffer->Data);
+		
+		auto inputBufObj = inputAudioPacket.GetField(NOS_NAME("buffer"));
+		if (!inputBufObj)
+			return NOS_RESULT_FAILED;
 
-		auto& inputPacketDesc = *pins.GetPinData<AudioPacketDescriptor>(NOS_NAME("InputAudioPacketDescriptor"));
 		auto& outputSampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("OutputSampleRate"));
 		auto& outputChannelCount = *pins.GetPinData<uint32_t>(NOS_NAME("OutputChannelCount"));
 
@@ -58,13 +75,11 @@ struct ResampleNode : NodeContext
 			
 			OutputAudio = sys::vulkan::CreateBuffer(audioBufferDesc, "Resample AudioBuffer");
 			if (!OutputAudio)
-				return NOS_RESULT_SUCCESS;
-
-			SetPinObject(NOS_NAME("OutputAudio"), OutputAudio);
+				return NOS_RESULT_FAILED;
 		}
 		
 		int32_t* outputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(OutputAudio));
-		int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(inputBuf));
+		int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(*inputBufObj));
 		
 		if (!outputAudioSamples || !inputAudioSamples)
 		{
@@ -122,10 +137,19 @@ struct ResampleNode : NodeContext
 		// Create output audio packet descriptor
 		AudioPacketDescriptor outputPacketDesc(
 			outputSampleRate, outputNumSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, sizeof(int32_t), outputChannelCount);
-		
-		// Set output pin values
-		SetPinValue(NOS_NAME("OutputAudioPacketDescriptor"), outputPacketDesc);
-		
+
+		auto newDescObj = PrimitiveObjectRef::Create(
+			NOS_NAME("nos.audio.AudioPacketDescriptor"),
+			nos::Buffer::From(outputPacketDesc));
+
+		std::unordered_map<nos::Name, nos::ObjectRef> audioPacketFields;
+		audioPacketFields[NOS_NAME("desc")] = newDescObj.value_or(ObjectRef());
+		audioPacketFields[NOS_NAME("buffer")] = OutputAudio;
+		auto audioPacket = CompositeObjectRef::Create(NOS_NAME("nos.audio.AudioPacket"), audioPacketFields);
+		if (!audioPacket)
+			return NOS_RESULT_FAILED;
+
+		SetPinObject(NOS_NAME("OutputAudioPacket"), *audioPacket);
 		return NOS_RESULT_SUCCESS;
 	}
 

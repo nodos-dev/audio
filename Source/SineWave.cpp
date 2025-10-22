@@ -55,11 +55,11 @@ struct SineWave : NodeContext
 		
 		// Create or resize audio buffer only if needed (with 1.5x headroom to avoid frequent reallocations)
 		size_t requiredBufferSize = numSamples * sizeof(uint32_t) * channelCount;
-		size_t allocatedBufferSize = AudioPacket ? sys::vulkan::GetResourceInfo(AudioPacket)->Size : 0;
+		size_t allocatedBufferSize = AudioPacketBuffer ? sys::vulkan::GetResourceInfo(AudioPacketBuffer)->Size : 0;
 		
-		if (!AudioPacket || requiredBufferSize > allocatedBufferSize)
+		if (!AudioPacketBuffer || requiredBufferSize > allocatedBufferSize)
 		{
-			AudioPacket = {};
+			AudioPacketBuffer = {};
 			
 			// Allocate 1.5x the required size to reduce frequency of reallocations
 			size_t newBufferSize = requiredBufferSize * 1.5f;
@@ -71,14 +71,12 @@ struct SineWave : NodeContext
 			audioBufferDesc.ElementType = NOS_BUFFER_ELEMENT_TYPE_INT32;
 			audioBufferDesc.FieldType = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
 			
-			AudioPacket = sys::vulkan::CreateBuffer(audioBufferDesc, "SineWave AudioBuffer");
-			if (!AudioPacket)
+			AudioPacketBuffer = sys::vulkan::CreateBuffer(audioBufferDesc, "SineWave AudioBuffer");
+			if (!AudioPacketBuffer)
 				return NOS_RESULT_FAILED;
-
-			SetPinObject(NOS_NAME("AudioPacket"), AudioPacket);
 		}
 		
-		int32_t* audioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(AudioPacket));
+		int32_t* audioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(AudioPacketBuffer));
 		if (!audioSamples) {
 			return NOS_RESULT_FAILED;
 		}
@@ -99,17 +97,26 @@ struct SineWave : NodeContext
 		
 		// Update current sample index for continuous playback
 		CurrentSampleIndex += numSamples;
-		
+
 		AudioPacketDescriptor audioPacketDesc(
 			sampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, 4, channelCount);
-		
-		// Set output pin values
-		SetPinValue(NOS_NAME("AudioPacketDescriptor"), audioPacketDesc);
-		
+
+		auto descObj = PrimitiveObjectRef::Create(
+			NOS_NAME("nos.audio.AudioPacketDescriptor"),
+			nos::Buffer::From(audioPacketDesc));
+
+		std::unordered_map<nos::Name, nos::ObjectRef> audioPacketFields;
+		audioPacketFields[NOS_NAME("desc")] = descObj.value_or(ObjectRef());
+		audioPacketFields[NOS_NAME("buffer")] = AudioPacketBuffer;
+		auto audioPacket = CompositeObjectRef::Create(NOS_NAME("nos.audio.AudioPacket"), audioPacketFields);
+		if (!audioPacket)
+			return NOS_RESULT_FAILED;
+
+		SetPinObject(NOS_NAME("AudioPacket"), *audioPacket);
 		return NOS_RESULT_SUCCESS;
 	}
 
-	TypedObjectRef<sys::vulkan::Buffer> AudioPacket;
+	TypedObjectRef<sys::vulkan::Buffer> AudioPacketBuffer;
 	uint64_t CurrentSampleIndex;
 	uint64_t TimeSoFar;
 	uint64_t AccumulatedSampleNumerator; // Accumulates fractional samples as integer numerator
