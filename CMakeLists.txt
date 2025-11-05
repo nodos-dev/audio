@@ -11,10 +11,10 @@ endif()
 
 add_compile_definitions(NOS_DISABLE_DEPRECATED)
 # Nodos SDK
-nos_find_plugin_sdk("39.12.0" NOS_PLUGIN_SDK_TARGET NOS_SDK_DIR)
+nos_find_plugin_sdk("40.0.0" NOS_PLUGIN_SDK_TARGET NOS_SDK_DIR)
 
 # nos.sys.vulkan
-nos_get_plugin("nos.sys.vulkan" "7.0" NOS_SYS_VULKAN_TARGET)
+nos_get_plugin("nos.sys.vulkan" "7.1" NOS_SYS_VULKAN_TARGET)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/External/AudioFile)
 
