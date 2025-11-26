@@ -38,11 +38,11 @@ struct ResampleNode : NodeContext
 		if (!descObj)
 			return NOS_RESULT_FAILED;
 		
-		auto descBuffer = descObj->GetPrimitiveDataView();
-		if (!descBuffer)
-			return NOS_RESULT_FAILED;
+		auto descBuffer = descObj->GetObjectDataView();
+		if (auto* err = descBuffer.Error())
+			return *err;
 		
-		auto& inputPacketDesc = *reinterpret_cast<const AudioPacketDescriptor*>(descBuffer->Data);
+		auto& inputPacketDesc = *static_cast<const AudioPacketDescriptor*>((*descBuffer).Data);
 		
 		auto inputBufObj = inputAudioPacket.GetField(NOS_NAME("buffer"));
 		if (!inputBufObj)

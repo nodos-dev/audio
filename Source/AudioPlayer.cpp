@@ -36,11 +36,11 @@ struct AudioPlayerNode : NodeContext
 		if (!desc || !buf)
 			return NOS_RESULT_FAILURE;
 
-		const nosBuffer* descBuf{};
-		if (NOS_RESULT_SUCCESS != nosEngine.ObjectAPI->GetPrimitiveObjectDataView(desc, &descBuf))
+		nosImmutableBuffer descBuf{};
+		if (NOS_RESULT_SUCCESS != nosEngine.ObjectAPI->GetObjectDataView(desc, &descBuf))
 			return NOS_RESULT_FAILURE;
 
-		auto& inputPacketDesc = *static_cast<AudioPacketDescriptor*>(descBuf->Data);
+		auto& inputPacketDesc = *static_cast<const AudioPacketDescriptor*>(descBuf.Data);
 		auto& soundBoost = *pins.GetPinData<float>(NOS_NAME("SoundBoost"));
 		auto& targetSampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("TargetSampleRate"));
 		auto inputSampleRate = inputPacketDesc.sample_rate();

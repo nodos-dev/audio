@@ -42,10 +42,10 @@ struct AudioOscilloscopeNode : NodeContext
 		if (!packetDescObj || !inputAudioBuf)
 			return NOS_RESULT_FAILURE;
 
-		const nosBuffer* descBuf{};
-		if (NOS_RESULT_SUCCESS != nosEngine.ObjectAPI->GetPrimitiveObjectDataView(packetDescObj, &descBuf))
+		nosImmutableBuffer descBuf{};
+		if (NOS_RESULT_SUCCESS != nosEngine.ObjectAPI->GetObjectDataView(packetDescObj, &descBuf))
 			return NOS_RESULT_FAILURE;
-		auto& inputPacketDesc = *static_cast<AudioPacketDescriptor*>(descBuf->Data);
+		auto& inputPacketDesc = *static_cast<const AudioPacketDescriptor*>(descBuf.Data);
 
 		auto outputTexture = pins.GetPinObject<sys::vulkan::Texture>(NOS_NAME("Output"));
 
