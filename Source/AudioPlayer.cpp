@@ -89,7 +89,6 @@ struct AudioPlayerNode : NodeContext
 			audioBufferDesc.MemoryFlags =
 				nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE | NOS_MEMORY_FLAGS_FORCE_HOST_MEMORY);
 			audioBufferDesc.ElementType = NOS_BUFFER_ELEMENT_TYPE_INT32;
-			audioBufferDesc.FieldType = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
 
 			OutputAudio = sys::vulkan::CreateBuffer(audioBufferDesc, "AudioPlayer AudioBuffer");
 			if (!OutputAudio)

@@ -99,7 +99,6 @@ struct AudioOscilloscopeNode : NodeContext
 			texInfo.Height = 1;
 			texInfo.Format = NOS_FORMAT_R32_SFLOAT;
 			texInfo.Usage = nosImageUsage(NOS_IMAGE_USAGE_SAMPLED | NOS_IMAGE_USAGE_TRANSFER_DST);
-			texInfo.FieldType = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
 			
 			ScopeTexture = sys::vulkan::CreateTexture(texInfo, "AudioOscilloscope TraceTexture");
 			if (!ScopeTexture)
