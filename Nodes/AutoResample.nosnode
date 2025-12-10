@@ -1,0 +1,1489 @@
+{ "nodes": [
+    {
+      "class_name": "nos.audio.AutoResample",
+			"menu_info": {
+				"category": "Audio",
+				"display_name": "Auto Resample"
+			},
+      "node": {
+        "id": "a9be22ea-8d70-44dd-b50e-e025cf5773fd",
+        "name": "AutoResample",
+        "class_name": "nos.audio.AutoResample",
+        "pins": [
+          {
+            "id": "41a82ce2-3e1a-4f31-9376-41f2890e5598",
+            "name": "Input",
+            "type_name": "nos.audio.AudioPacket",
+            "show_as": "INPUT_PIN",
+            "can_show_as": "INPUT_PIN_OR_PROPERTY",
+            "visualizers": [],
+            "data": { "desc": {
+                "sample_rate": 48000,
+                "num_samples": 801,
+                "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                "sample_stride": 4,
+                "channel_count": 2
+              }, "buffer": {
+                "size_in_bytes": 7040,
+                "alignment": 0,
+                "external_memory": {
+                  "handle_type": 2,
+                  "handle": 6148,
+                  "allocation_size": 33554432,
+                  "pid": 51720,
+                  "offset": 30813696
+                },
+                "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                "memory_flags": "HOST_VISIBLE",
+                "element_type": "ELEMENT_TYPE_INT32"
+              } },
+            "min": { "desc": {
+                "sample_rate": 0,
+                "num_samples": 0,
+                "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                "sample_stride": 0,
+                "channel_count": 0
+              }, "buffer": {
+                "size_in_bytes": 0,
+                "alignment": 0,
+                "external_memory": {
+                  "handle_type": 0,
+                  "handle": 0,
+                  "allocation_size": 0,
+                  "pid": 0,
+                  "offset": 0
+                },
+                "usage": "NONE",
+                "memory_flags": "NONE",
+                "element_type": "ELEMENT_TYPE_UNDEFINED"
+              } },
+            "max": { "desc": {
+                "sample_rate": 0,
+                "num_samples": 0,
+                "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                "sample_stride": 0,
+                "channel_count": 0
+              }, "buffer": {
+                "size_in_bytes": 0,
+                "alignment": 0,
+                "external_memory": {
+                  "handle_type": 0,
+                  "handle": 0,
+                  "allocation_size": 0,
+                  "pid": 0,
+                  "offset": 0
+                },
+                "usage": "NONE",
+                "memory_flags": "NONE",
+                "element_type": "ELEMENT_TYPE_UNDEFINED"
+              } },
+            "def": { "desc": {
+                "sample_rate": 0,
+                "num_samples": 0,
+                "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                "sample_stride": 0,
+                "channel_count": 0
+              }, "buffer": {
+                "size_in_bytes": 0,
+                "alignment": 0,
+                "external_memory": {
+                  "handle_type": 0,
+                  "handle": 0,
+                  "allocation_size": 0,
+                  "pid": 0,
+                  "offset": 0
+                },
+                "usage": "NONE",
+                "memory_flags": "NONE",
+                "element_type": "ELEMENT_TYPE_UNDEFINED"
+              } },
+            "contents_type": "PortalPin",
+            "contents": { "source_id": "d8118a2f-2e87-466e-97db-acee73ff8872" },
+            "orphan_state": { }
+          },
+          {
+            "id": "f16569e1-9fae-4bc1-aba7-8399bab2247b",
+            "name": "Output",
+            "type_name": "nos.audio.AudioPacket",
+            "show_as": "OUTPUT_PIN",
+            "can_show_as": "OUTPUT_PIN_ONLY",
+            "visualizers": [],
+            "data": { "desc": {
+                "sample_rate": 48000,
+                "num_samples": 800,
+                "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                "sample_stride": 4,
+                "channel_count": 6
+              }, "buffer": {
+                "size_in_bytes": 21120,
+                "alignment": 0,
+                "external_memory": {
+                  "handle_type": 2,
+                  "handle": 6148,
+                  "allocation_size": 33554432,
+                  "pid": 51720,
+                  "offset": 30861696
+                },
+                "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                "memory_flags": "HOST_VISIBLE",
+                "element_type": "ELEMENT_TYPE_INT32"
+              } },
+            "def": { "desc": {
+                "sample_rate": 0,
+                "num_samples": 0,
+                "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                "sample_stride": 0,
+                "channel_count": 0
+              }, "buffer": {
+                "size_in_bytes": 0,
+                "alignment": 0,
+                "external_memory": {
+                  "handle_type": 0,
+                  "handle": 0,
+                  "allocation_size": 0,
+                  "pid": 0,
+                  "offset": 0
+                },
+                "usage": "NONE",
+                "memory_flags": "NONE",
+                "element_type": "ELEMENT_TYPE_UNDEFINED"
+              } },
+            "contents_type": "PortalPin",
+            "contents": { "source_id": "6958519d-5b38-42bb-be06-c0b19fc7b020" },
+            "orphan_state": { }
+          },
+          {
+            "id": "3a26bead-e1e4-4e5d-98a3-3e9ccd896bd5",
+            "name": "B",
+            "type_name": "uint",
+            "show_as": "INPUT_PIN",
+            "can_show_as": "INPUT_PIN_OR_PROPERTY",
+            "visualizers": [],
+            "data": 48000,
+            "def": 0,
+            "contents_type": "PortalPin",
+            "contents": { "source_id": "ebce45d2-e24e-4fa1-8d76-e7ad0ea83b2f" },
+            "orphan_state": { }
+          },
+          {
+            "id": "d4dd4b15-399b-484f-b6e9-bc3242dd4c93",
+            "name": "B (1)",
+            "type_name": "uint",
+            "show_as": "INPUT_PIN",
+            "can_show_as": "INPUT_PIN_OR_PROPERTY",
+            "visualizers": [],
+            "data": 6,
+            "def": 0,
+            "contents_type": "PortalPin",
+            "contents": { "source_id": "69afc269-3462-40c1-a7dd-d104d9629ab6" },
+            "orphan_state": { }
+          }
+        ],
+        "pos": { "x": 0.0, "y": 0.0 },
+        "contents_type": "Graph",
+        "contents": { "nodes": [
+            {
+              "id": "15511e1b-8139-41e5-a31e-66737c072620",
+              "name": "IsEqual",
+              "class_name": "nos.reflect.IsEqual",
+              "pins": [
+                {
+                  "id": "0b53c4b5-6a8d-4738-94bd-0ccf3e9c3991",
+                  "name": "A",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 48000,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "596937b6-f318-4318-8af6-e0643e9ae492",
+                  "name": "B",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 48000,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "841c2bf2-71f0-471a-b483-cf7c2ca14e05",
+                  "name": "IsEqual",
+                  "type_name": "bool",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": true,
+                  "def": false,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "Is Equal"
+                }
+              ],
+              "pos": { "x": 179.0, "y": 1345.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Sample Rate 48000",
+              "plugin_version": { "major": 3, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "8ccb9f5a-45d6-4f45-97eb-81edf2e05e32",
+              "name": "Break (1)",
+              "class_name": "nos.reflect.Break",
+              "pins": [
+                {
+                  "id": "09c6f510-5cae-4d8c-9052-3862049f5621",
+                  "name": "Input",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 801,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 2
+                    }, "buffer": {
+                      "size_in_bytes": 7040,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6148,
+                        "allocation_size": 33554432,
+                        "pid": 51720,
+                        "offset": 30813696
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "min": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "max": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "365883f5-6c66-4e1f-aa5a-5ea643c5e331",
+                  "name": "desc",
+                  "type_name": "nos.audio.AudioPacketDescriptor",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": {
+                    "sample_rate": 48000,
+                    "num_samples": 801,
+                    "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                    "sample_stride": 4,
+                    "channel_count": 2
+                  },
+                  "min": {
+                    "sample_rate": 0,
+                    "num_samples": 0,
+                    "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                    "sample_stride": 0,
+                    "channel_count": 0
+                  },
+                  "max": {
+                    "sample_rate": 0,
+                    "num_samples": 0,
+                    "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                    "sample_stride": 0,
+                    "channel_count": 0
+                  },
+                  "def": {
+                    "sample_rate": 0,
+                    "num_samples": 0,
+                    "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                    "sample_stride": 0,
+                    "channel_count": 0
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "4603b189-b687-4650-8d21-bf2151771bc4",
+                  "name": "buffer",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 7040,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 2,
+                      "handle": 6148,
+                      "allocation_size": 33554432,
+                      "pid": 51720,
+                      "offset": 30813696
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_INT32"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                }
+              ],
+              "pos": { "x": -470.0, "y": 1365.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Break nos.audio.AudioPacket",
+              "plugin_version": { "major": 3, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "2af1b8d8-ee32-4ef1-92dc-e6873863cb05",
+              "name": "Break (4)",
+              "class_name": "nos.reflect.Break",
+              "pins": [
+                {
+                  "id": "86e796ee-90d0-4491-aca1-f09f39ca7ae2",
+                  "name": "Input",
+                  "type_name": "nos.audio.AudioPacketDescriptor",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": {
+                    "sample_rate": 48000,
+                    "num_samples": 801,
+                    "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                    "sample_stride": 4,
+                    "channel_count": 2
+                  },
+                  "def": {
+                    "sample_rate": 0,
+                    "num_samples": 0,
+                    "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                    "sample_stride": 0,
+                    "channel_count": 0
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "4b95cd9b-bc15-4dad-80c1-e54a4ddd0e28",
+                  "name": "sample_rate",
+                  "type_name": "uint",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 48000,
+                  "max": 0,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "41b3284f-4387-4f2a-aae5-b9ac427d4b3f",
+                  "name": "num_samples",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 801,
+                  "max": 0,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "668543cd-b154-4886-8f56-5b8d7afa76dd",
+                  "name": "bit_depth",
+                  "type_name": "nos.audio.BitDepth",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": "AUDIO_BIT_DEPTH_24_BIT",
+                  "max": "AUDIO_BIT_DEPTH_24_BIT",
+                  "def": "AUDIO_BIT_DEPTH_24_BIT",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "89043f8c-4b80-4b82-ba02-42ff59e8b1ef",
+                  "name": "sample_stride",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 4,
+                  "max": 0,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "23a31eeb-f3b2-46f4-a4eb-ca51c5d9e874",
+                  "name": "channel_count",
+                  "type_name": "uint",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 2,
+                  "max": 0,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                }
+              ],
+              "pos": { "x": -152.0, "y": 1376.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Break nos.audio.AudioPacketDescriptor",
+              "plugin_version": { "major": 3, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "3301308d-1161-40c4-b57c-a917b87c3748",
+              "name": "B (1)",
+              "class_name": "nos.internal.GraphInput",
+              "pins": [
+                {
+                  "id": "b1355018-c842-4ae3-9081-a403d7cf5e03",
+                  "name": "Output",
+                  "type_name": "uint",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": 6,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "69afc269-3462-40c1-a7dd-d104d9629ab6",
+                  "name": "Input",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 6,
+                  "referred_by": [
+                    "d4dd4b15-399b-484f-b6e9-bc3242dd4c93"
+                  ],
+                  "def": 0,
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                }
+              ],
+              "pos": { "x": -173.0, "y": 1579.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "ChannelCount",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "2116fe9a-81c8-4e29-861c-a892b1de50e5",
+              "name": "Switch",
+              "class_name": "nos.engine.Switch",
+              "pins": [
+                {
+                  "id": "bcea467a-ed3b-4f7b-aa52-e2b83bb856f1",
+                  "name": "Case",
+                  "type_name": "bool",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": false,
+                  "def": false,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "fb11da05-8ba0-4858-9d64-e35e5b1f09ce",
+                  "name": "True",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 789,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 6
+                    }, "buffer": {
+                      "size_in_bytes": 24000,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6148,
+                        "allocation_size": 33554432,
+                        "pid": 51720,
+                        "offset": 30414848
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "028babf7-c6a5-4cb1-9f69-12d48aa1d050",
+                  "name": "False",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 800,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 6
+                    }, "buffer": {
+                      "size_in_bytes": 21120,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6148,
+                        "allocation_size": 33554432,
+                        "pid": 51720,
+                        "offset": 30678336
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "f5ef2f5a-15b9-4e29-bf85-24d02501abe8",
+                  "name": "Output",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                }
+              ],
+              "pos": { "x": 497.0, "y": 1412.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "e8eed9bb-058f-4274-bd1d-863bedd2a738",
+              "name": "IsEqual (1)",
+              "class_name": "nos.reflect.IsEqual",
+              "pins": [
+                {
+                  "id": "ad9ae947-4db2-4cd4-82db-af989a4d24b4",
+                  "name": "A",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 2,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "35f1fba5-9372-49e2-82de-7873c95b6123",
+                  "name": "B",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 6,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "70073644-e658-46d1-9f7c-2bbb6228839b",
+                  "name": "IsEqual",
+                  "type_name": "bool",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": false,
+                  "def": false,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "Is Equal"
+                }
+              ],
+              "pos": { "x": 175.0, "y": 1448.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Channel Count 6",
+              "plugin_version": { "major": 3, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "ef373930-5ebd-4b10-a342-40084ae353b4",
+              "name": "Reroute (14)",
+              "class_name": "nos.internal.Reroute",
+              "pins": [
+                {
+                  "id": "c9d44720-2757-4939-aa02-6ae546ab9942",
+                  "name": "Input",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 801,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 2
+                    }, "buffer": {
+                      "size_in_bytes": 7040,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6148,
+                        "allocation_size": 33554432,
+                        "pid": 51720,
+                        "offset": 30820736
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "1b7981b0-4090-4e2b-8b97-b349ab7b4be7",
+                  "name": "Output",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 789,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 6
+                    }, "buffer": {
+                      "size_in_bytes": 24000,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6148,
+                        "allocation_size": 33554432,
+                        "pid": 51720,
+                        "offset": 30414848
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                }
+              ],
+              "pos": { "x": 321.0, "y": 1501.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "fb20f084-fc84-43a9-a62b-e61047bd1328",
+              "name": "And",
+              "class_name": "nos.math.And",
+              "pins": [
+                {
+                  "id": "b31cae0e-2708-4ca3-8c3e-9fda4be7af8b",
+                  "name": "A",
+                  "type_name": "bool",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": true,
+                  "def": false,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "9bb0b891-c250-40cd-b5f1-8305eccd2788",
+                  "name": "B",
+                  "type_name": "bool",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": false,
+                  "def": false,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "75a27284-4556-4eb3-a4ba-6cb594ddb8c0",
+                  "name": "AndResult",
+                  "type_name": "bool",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": false,
+                  "def": false,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "And"
+                }
+              ],
+              "pos": { "x": 348.0, "y": 1380.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "description": "Returns true if both A and B are true",
+              "plugin_version": { "major": 2, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "3fb00586-3cde-48d0-b823-6cb91953df5a",
+              "name": "Resample",
+              "class_name": "nos.audio.Resample",
+              "pins": [
+                {
+                  "id": "1ad8bd1d-74f9-424b-8581-edca8f8f4978",
+                  "name": "InputAudioPacket",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 801,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 2
+                    }, "buffer": {
+                      "size_in_bytes": 7040,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6148,
+                        "allocation_size": 33554432,
+                        "pid": 51720,
+                        "offset": 30813696
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "In Audio Packet"
+                },
+                {
+                  "id": "61ed779f-a42e-401e-a50c-52ac1caa10bb",
+                  "name": "OutputSampleRate",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 48000,
+                  "def": 48000,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "Out Sample Rate"
+                },
+                {
+                  "id": "de5dad52-ab30-4775-a31e-a7d2439fba9a",
+                  "name": "OutputChannelCount",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 6,
+                  "def": 2,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "Out Channel Count"
+                },
+                {
+                  "id": "b3a32537-a148-4413-aeba-2e3a0c69cc1a",
+                  "name": "OutputAudioPacket",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 800,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 6
+                    }, "buffer": {
+                      "size_in_bytes": 21120,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6148,
+                        "allocation_size": 33554432,
+                        "pid": 51720,
+                        "offset": 30861696
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "Out Audio Packet"
+                }
+              ],
+              "pos": { "x": 203.0, "y": 1585.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "description": "Resamples audio to different sample rate and channel count",
+              "display_name": "Audio Resample",
+              "plugin_version": { "major": 1, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "7f4f0cd9-d7cc-4ace-9039-4d9122c27ba5",
+              "name": "Input",
+              "class_name": "nos.internal.GraphInput",
+              "pins": [
+                {
+                  "id": "525c69b1-7386-4fb4-84e1-c89e7c9c1923",
+                  "name": "Output",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 801,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 2
+                    }, "buffer": {
+                      "size_in_bytes": 7040,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6148,
+                        "allocation_size": 33554432,
+                        "pid": 51720,
+                        "offset": 30813696
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "min": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "max": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "d8118a2f-2e87-466e-97db-acee73ff8872",
+                  "name": "Input",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 801,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 2
+                    }, "buffer": {
+                      "size_in_bytes": 7040,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6148,
+                        "allocation_size": 33554432,
+                        "pid": 51720,
+                        "offset": 30813696
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "referred_by": [
+                    "41a82ce2-3e1a-4f31-9376-41f2890e5598"
+                  ],
+                  "min": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "max": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                }
+              ],
+              "pos": { "x": -685.0, "y": 1427.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "91098ee6-f051-4434-86b9-077def2f2904",
+              "name": "Output",
+              "class_name": "nos.internal.GraphOutput",
+              "pins": [
+                {
+                  "id": "7df5bd34-2cfb-4aa7-927c-4b971bdb1688",
+                  "name": "Input",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 800,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 6
+                    }, "buffer": {
+                      "size_in_bytes": 21120,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6148,
+                        "allocation_size": 33554432,
+                        "pid": 51720,
+                        "offset": 30861696
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "6958519d-5b38-42bb-be06-c0b19fc7b020",
+                  "name": "Output",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 800,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 6
+                    }, "buffer": {
+                      "size_in_bytes": 21120,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6148,
+                        "allocation_size": 33554432,
+                        "pid": 51720,
+                        "offset": 30861696
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "referred_by": [
+                    "f16569e1-9fae-4bc1-aba7-8399bab2247b"
+                  ],
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                }
+              ],
+              "pos": { "x": 697.0, "y": 1426.25 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "b3773eb0-0960-4714-bf90-e7ebbde34e47",
+              "name": "B",
+              "class_name": "nos.internal.GraphInput",
+              "pins": [
+                {
+                  "id": "67ad4300-98a6-41c6-a827-3f959bc56a4c",
+                  "name": "Output",
+                  "type_name": "uint",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": 48000,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "ebce45d2-e24e-4fa1-8d76-e7ad0ea83b2f",
+                  "name": "Input",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 48000,
+                  "referred_by": [
+                    "3a26bead-e1e4-4e5d-98a3-3e9ccd896bd5"
+                  ],
+                  "def": 0,
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                }
+              ],
+              "pos": { "x": -173.0, "y": 1504.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "SampleRate",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            }
+          ], "connections": [
+            { "from": "4b95cd9b-bc15-4dad-80c1-e54a4ddd0e28", "to": "0b53c4b5-6a8d-4738-94bd-0ccf3e9c3991", "id": "50e9fcd3-4b55-476c-ad1f-d9127c9afc8e" },
+            { "from": "75a27284-4556-4eb3-a4ba-6cb594ddb8c0", "to": "bcea467a-ed3b-4f7b-aa52-e2b83bb856f1", "id": "0df6aedb-9e74-47b3-b1b2-9bb56f867649" },
+            { "from": "70073644-e658-46d1-9f7c-2bbb6228839b", "to": "9bb0b891-c250-40cd-b5f1-8305eccd2788", "id": "86c6558e-6f7f-4186-9a29-8699e68dd67c" },
+            { "from": "23a31eeb-f3b2-46f4-a4eb-ca51c5d9e874", "to": "ad9ae947-4db2-4cd4-82db-af989a4d24b4", "id": "31d624c2-0b51-486f-b684-200b9459d5e0" },
+            { "from": "841c2bf2-71f0-471a-b483-cf7c2ca14e05", "to": "b31cae0e-2708-4ca3-8c3e-9fda4be7af8b", "id": "a043ff2e-b090-4a2e-9788-37b547678367" },
+            { "from": "365883f5-6c66-4e1f-aa5a-5ea643c5e331", "to": "86e796ee-90d0-4491-aca1-f09f39ca7ae2", "id": "2ee1957d-c96c-4c4e-88ce-82177fadc167" },
+            { "from": "b3a32537-a148-4413-aeba-2e3a0c69cc1a", "to": "028babf7-c6a5-4cb1-9f69-12d48aa1d050", "id": "70073e2b-5378-429a-8f3a-7f1f935d3f4e" },
+            { "from": "67ad4300-98a6-41c6-a827-3f959bc56a4c", "to": "596937b6-f318-4318-8af6-e0643e9ae492", "id": "7847cd54-117b-473b-89d7-18ed1839853d" },
+            { "from": "1b7981b0-4090-4e2b-8b97-b349ab7b4be7", "to": "fb11da05-8ba0-4858-9d64-e35e5b1f09ce", "id": "87e3a691-cb02-4076-886d-5f1d76ad3ff0" },
+            { "from": "f5ef2f5a-15b9-4e29-bf85-24d02501abe8", "to": "7df5bd34-2cfb-4aa7-927c-4b971bdb1688", "id": "640efc1f-2a7f-49b8-a61e-ef4bb70baf09" },
+            { "from": "525c69b1-7386-4fb4-84e1-c89e7c9c1923", "to": "09c6f510-5cae-4d8c-9052-3862049f5621", "id": "809cf27f-3317-4a09-a603-9381f7e4e6f8" },
+            { "from": "525c69b1-7386-4fb4-84e1-c89e7c9c1923", "to": "c9d44720-2757-4939-aa02-6ae546ab9942", "id": "9f02819f-fd83-43e6-9d77-6d679dbb4290" },
+            { "from": "525c69b1-7386-4fb4-84e1-c89e7c9c1923", "to": "1ad8bd1d-74f9-424b-8581-edca8f8f4978", "id": "3c09b0fc-89d4-4c7d-997e-a8921431c228" },
+            { "from": "b1355018-c842-4ae3-9081-a403d7cf5e03", "to": "35f1fba5-9372-49e2-82de-7873c95b6123", "id": "c340e08a-c2b9-4c0a-a946-7aa96e5e28dd" }
+          ] },
+        "function_category": "Default Node",
+        "display_name": "Auto Resample",
+        "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+      }
+    }
+  ] }
