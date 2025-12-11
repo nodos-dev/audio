@@ -16,13 +16,26 @@ namespace nos::audio
 {
 struct AudioPlayerNode : NodeContext
 {
-	nosResult OnCreate(nosFbNodePtr) override { return NOS_RESULT_SUCCESS; }
+	nosResult OnCreate(nosFbNodePtr) override
+	{
+		AddPinValueWatcher<bool>(NOS_NAME("RewindPlaybackOnPathStart"),
+								 [this](const bool* newVal, std::optional<const bool*> oldVal) {
+									 RewindPlaybackOnPathStart = *newVal;
+								 });
+		return NOS_RESULT_SUCCESS;
+	}
+
+	std::string ProgressStatusString;
 
 	void OnPathStart() override
 	{
-		AccumulatedSampleNumerator = 0;
-		LastSampleTime = 0;
-		LastSampleTimeFract = 0.0f;
+		ClearNodeStatusMessages();
+		if (RewindPlaybackOnPathStart)
+		{
+			AccumulatedSampleNumerator = 0;
+			LastSampleTime = 0;
+			LastSampleTimeFract = 0.0f;
+		}
 	}
 
 	nosResult ExecuteNode(NodeExecuteParams const& pins) override
@@ -151,16 +164,39 @@ struct AudioPlayerNode : NodeContext
 		
 		NOS_SOFT_CHECK(out, "Failed to create output AudioPacket object");
 
+		// Calculate and set progress (0.0 to 1.0)
+		float progress = 0.0f;
+		if (inputPacketDesc.num_samples() > 0)
+		{
+			// Calculate the current sample position in the input audio
+			float targetSampleTimeFract = LastSampleTimeFract;
+			uint64_t currentSamplePosition = LastSampleTime * inputSampleRate + static_cast<uint64_t>(targetSampleTimeFract * inputSampleRate);
+			currentSamplePosition %= inputPacketDesc.num_samples();
+			progress = static_cast<float>(currentSamplePosition) / static_cast<float>(inputPacketDesc.num_samples());
+		}
+
 		// Set output pin values
 		SetPinObject(NOS_NAME("AudioPacket"), out);
+		SetPinValue(NOS_NAME("Progress"), progress);
+
+		float progressSegmentLength = 0.01f;
+		progress = std::floor(progress / progressSegmentLength) * progressSegmentLength;
+		
+		std::string newProgressStatusString = "Playback Progress: " + std::to_string(static_cast<int>(progress * 100.0f)) + "%";
+		if (newProgressStatusString != ProgressStatusString)
+		{
+			SetNodeStatusMessage(newProgressStatusString, fb::NodeStatusMessageType::INFO);
+			ProgressStatusString = newProgressStatusString;
+		}
 
 		return NOS_RESULT_SUCCESS;
 	}
 
 	TypedObjectRef<sys::vulkan::Buffer> OutputAudio;
-	uint64_t AccumulatedSampleNumerator; // Accumulates fractional samples as integer numerator
+	uint64_t AccumulatedSampleNumerator = 0; // Accumulates fractional samples as integer numerator
 	uint64_t LastSampleTime = 0;
 	float LastSampleTimeFract = 0.0f;
+	bool RewindPlaybackOnPathStart = false;
 };
 
 nosResult RegisterAudioPlayerNode(nosNodeFunctions* fn)

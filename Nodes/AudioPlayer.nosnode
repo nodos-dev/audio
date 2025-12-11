@@ -20,6 +20,7 @@
 					},
 					{
 						"name": "TargetSampleRate",
+						"display_name": "Target Sample Rate",
 						"type_name": "uint",
 						"show_as": "PROPERTY",
 						"can_show_as": "INPUT_PIN_OR_PROPERTY",
@@ -27,6 +28,7 @@
 					},
 					{
 						"name": "SoundBoost",
+						"display_name": "Sound Boost",
 						"type_name": "float",
 						"show_as": "PROPERTY",
 						"can_show_as": "INPUT_PIN_OR_PROPERTY",
@@ -38,6 +40,27 @@
 						"type_name": "nos.audio.AudioPacket",
 						"show_as": "OUTPUT_PIN",
 						"can_show_as": "OUTPUT_PIN_ONLY"
+					},
+					{
+						"name": "RewindPlaybackOnPathStart",
+						"display_name": "Rewind Playback On Path Start",
+						"description": "If enabled, the audio playback cursor will reset to the beginning whenever the node path is started.",
+						"type_name": "bool",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": true
+					},
+					{
+						"name": "Progress",
+						"display_name": "Progress",
+						"description": "Shows the progress of the playback between 0 and 1.",
+						"type_name": "float",
+						"show_as": "PROPERTY",
+						"can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+						"readonly": true,
+						"data": 0.0,
+						"min": 0.0,
+						"max": 1.0
 					}
 				]
 			}

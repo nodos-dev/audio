@@ -75,7 +75,7 @@
 							"z": 0.36,
 							"w": 1.0
 						},
-						"visualizer": { "type": "COLOR_PICKER" },
+						"visualizers": [{ "type": "COLOR_PICKER" }],
 						"step": 0.01,
 						"description": "Color of the oscilloscope trace."
 					},
