@@ -4,6 +4,8 @@
 
 #include <nosVulkanSubsystem/Helpers.hpp>
 #include <cmath>
+#include <chrono>
+#include <sstream>
 
 #include "Audio_generated.h"
 
@@ -15,27 +17,65 @@
 
 namespace nos::audio
 {
+
+enum State
+{
+	Idle = 0,
+	Loading = 1,
+	Failed = 2,
+};
+
 struct ReadAudioFileNode : NodeContext
 {
+	decltype(std::chrono::high_resolution_clock::now()) TimeStarted = std::chrono::high_resolution_clock::now();
+
+	void UpdateStatus(State newState, const char* path, const std::string& audioInfo = "")
+	{
+		switch(newState)
+		{
+		case State::Loading:
+			TimeStarted = std::chrono::high_resolution_clock::now();
+			SetNodeStatusMessage("Loading audio file: " + std::string(path), fb::NodeStatusMessageType::INFO);
+			break;
+		case State::Idle:
+		{
+			auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() -
+																			TimeStarted)
+						  .count();
+			std::stringstream ss;
+			std::filesystem::path fsPath = nos::Utf8ToPath(path);
+			ss << "Audio file loaded: " << nos::PathToUtf8(fsPath.filename()) << " (" << dt << "ms)\n" << audioInfo;
+			SetNodeStatusMessage(ss.str(), fb::NodeStatusMessageType::INFO);
+			break;
+		}
+		case State::Failed:
+		{
+			SetNodeStatusMessage("Failed to load audio file: " + std::string(path), fb::NodeStatusMessageType::FAILURE);
+			break;
+		}
+		}
+	}
+
 	nosResult ExecuteNode(NodeExecuteParams const& pins) override
 	{
 		AudioFile<int32_t> audioFile{};
 		auto path = pins.GetPinData<const char*>(NOS_NAME("Path"));
+		UpdateStatus(State::Loading, path);
 		if (!audioFile.load(path))
 		{
 			nosEngine.LogE("Failed to load audio file: %s", path);
+			UpdateStatus(State::Failed, path);
 			return NOS_RESULT_FAILED;
 		}
-		std::stringstream ss;
-		ss << "Audio file read from " << path << std::endl
-		   << "\t|======================================| " << std::endl
-		   << "\t| Num Channels: " << audioFile.getNumChannels() << std::endl
-		   << "\t| Num Samples Per Channel: " << audioFile.getNumSamplesPerChannel() << std::endl
-		   << "\t| Sample Rate: " << audioFile.getSampleRate() << std::endl
-		   << "\t| Bit Depth: " << audioFile.getBitDepth() << std::endl
-		   << "\t| Length in Seconds: " << audioFile.getLengthInSeconds() << std::endl
-		   << "\t|======================================|" << std::endl;
-		nosEngine.LogI("%s", ss.str().c_str());
+		
+		std::stringstream audioInfoSS;
+		audioInfoSS << "- Channel Count: " << audioFile.getNumChannels() << "\n"
+					<< "- Samples Per Channel : " << audioFile.getNumSamplesPerChannel() << "\n"
+					<< "- Sample Rate: " << audioFile.getSampleRate() << "\n"
+					<< "- Bit Depth: " << audioFile.getBitDepth() << "\n"
+					<< "- Length in Seconds: " << audioFile.getLengthInSeconds();
+		std::string audioInfo = audioInfoSS.str();
+		nosEngine.LogI("Audio file read from %s\n%s", path, audioInfo.c_str());
 
 		auto channelCount = *pins.GetPinData<uint32_t>(NOS_NAME("ChannelCount"));
 
@@ -50,6 +90,7 @@ struct ReadAudioFileNode : NodeContext
 		{
 			nosEngine.LogE("Failed to create buffer for audio file: %s",
 						   pins.GetPinData<const char*>(NOS_NAME("Path")));
+			UpdateStatus(State::Failed, path);
 			return NOS_RESULT_FAILED;
 		}
 		int32_t* data = reinterpret_cast<int32_t*>(nosVulkan->Map(bufferObject));
@@ -82,6 +123,7 @@ struct ReadAudioFileNode : NodeContext
 		ObjectRef audioPacket{};
 		nosEngine.ObjectAPI->CreateCompositeObject(NOS_NAME("nos.audio.AudioPacket"), fields.data(), fields.size(), &audioPacket.GetStorage());
 		SetPinObject(NOS_NAME("FullAudio"), audioPacket);
+		UpdateStatus(State::Idle, path, audioInfo);
 		return NOS_RESULT_SUCCESS;
 	}
 };
