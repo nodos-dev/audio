@@ -70,10 +70,9 @@ struct ReadAudioFileNode : NodeContext
 		
 		std::stringstream audioInfoSS;
 		audioInfoSS << "- Channel Count: " << audioFile.getNumChannels() << "\n"
-					<< "- Samples Per Channel : " << audioFile.getNumSamplesPerChannel() << "\n"
 					<< "- Sample Rate: " << audioFile.getSampleRate() << "\n"
 					<< "- Bit Depth: " << audioFile.getBitDepth() << "\n"
-					<< "- Length in Seconds: " << audioFile.getLengthInSeconds();
+					<< "- Duration (s): " << audioFile.getLengthInSeconds();
 		std::string audioInfo = audioInfoSS.str();
 		nosEngine.LogI("Audio file read from %s\n%s", path, audioInfo.c_str());
 
