@@ -65,11 +65,11 @@ struct UnpackAudioBuffer : NodeContext
 		
 		// Create or resize audio buffer only if needed (with 1.1x headroom to avoid frequent reallocations)
 		size_t requiredBufferSize = std::max(size_t(numSamples * sizeof(uint32_t) * channelCount), size_t(1000));
-		size_t allocatedBufferSize = OutputAudioPacket ? sys::vulkan::GetResourceInfo(OutputAudioPacket)->Size : 0;
+		size_t allocatedBufferSize = OutputAudioBuffer ? sys::vulkan::GetResourceInfo(OutputAudioBuffer)->Size : 0;
 		
-		if (!OutputAudioPacket || requiredBufferSize > allocatedBufferSize)
+		if (!OutputAudioBuffer || requiredBufferSize > allocatedBufferSize)
 		{
-			OutputAudioPacket = {};
+			OutputAudioBuffer = {};
 			
 			// Allocate 1.1x the required size to reduce frequency of reallocations
 			size_t newBufferSize = requiredBufferSize * 1.1f;
@@ -80,14 +80,12 @@ struct UnpackAudioBuffer : NodeContext
 			audioBufferDesc.MemoryFlags = nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE);
 			audioBufferDesc.ElementType = NOS_BUFFER_ELEMENT_TYPE_INT32;
 			
-			OutputAudioPacket = sys::vulkan::CreateBuffer(audioBufferDesc, "Unpacked Audio Buffer");
-			if (!OutputAudioPacket)
+			OutputAudioBuffer = sys::vulkan::CreateBuffer(audioBufferDesc, "Unpacked Audio Buffer");
+			if (!OutputAudioBuffer)
 				return NOS_RESULT_SUCCESS;
-
-			SetPinObject(NOS_NAME("Audio"), OutputAudioPacket);
 		}
 		
-		int32_t* outputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(OutputAudioPacket));
+		int32_t* outputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(OutputAudioBuffer));
 		if (!outputAudioSamples)
 			return NOS_RESULT_SUCCESS;
 		
@@ -103,14 +101,22 @@ struct UnpackAudioBuffer : NodeContext
 		
 		AudioPacketDescriptor audioPacketDesc(
 			sampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, 4, channelCount);
-		
-		// Set output pin values
-		SetPinValue(NOS_NAME("AudioPacketDescriptor"), audioPacketDesc);
-		
+
+		auto newDescObj = PrimitiveObjectRef::Create(NOS_NAME("nos.audio.AudioPacketDescriptor"), nos::Buffer::From(audioPacketDesc));
+
+		std::unordered_map<nos::Name, nos::ObjectRef> audioPacketFields;
+		audioPacketFields[NOS_NAME("desc")] = newDescObj.value_or(ObjectRef());
+		audioPacketFields[NOS_NAME("buffer")] = OutputAudioBuffer;
+		auto audioPacket = CompositeObjectRef::Create(NOS_NAME("nos.audio.AudioPacket"), audioPacketFields);
+		if (!audioPacket)
+			return NOS_RESULT_FAILED;
+
+		SetPinObject(NOS_NAME("Audio"), *audioPacket);
+
 		return NOS_RESULT_SUCCESS;
 	}
 
-	TypedObjectRef<sys::vulkan::Buffer> OutputAudioPacket;
+	TypedObjectRef<sys::vulkan::Buffer> OutputAudioBuffer;
 };
 
 nosResult RegisterUnpackAudioBufferNode(nosNodeFunctions* fn)
