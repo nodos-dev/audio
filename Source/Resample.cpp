@@ -48,6 +48,22 @@ struct ResampleNode : NodeContext
 		if (!inputBufObj)
 			return NOS_RESULT_FAILED;
 
+		auto requiredInputAudioBufferSize =
+			inputPacketDesc.num_samples() * sizeof(uint32_t) * inputPacketDesc.channel_count();
+		auto inputAudioBufferInfo = sys::vulkan::GetResourceInfo(*inputBufObj);
+		if (!inputAudioBufferInfo)
+		{
+			nosEngine.LogE("%s: Failed to get input audio buffer info.",
+						   nos::GetItemPath(NodeId).value_or("<unknown>").c_str());
+			return NOS_RESULT_SUCCESS;
+		}
+		if (inputAudioBufferInfo->Buffer.Size < requiredInputAudioBufferSize)
+		{
+			nosEngine.LogE("%s: Input audio buffer size is smaller than expected.",
+						   nos::GetItemPath(NodeId).value_or("<unknown>").c_str());
+			return NOS_RESULT_SUCCESS;
+		}
+
 		auto& outputSampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("OutputSampleRate"));
 		auto& outputChannelCount = *pins.GetPinData<uint32_t>(NOS_NAME("OutputChannelCount"));
 
