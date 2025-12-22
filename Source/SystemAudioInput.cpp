@@ -423,6 +423,10 @@ struct SystemAudioInputNode : NodeContext
 			Capture.reset();
 			SetNodeStatusMessageIfChanged("System audio input inactive", fb::NodeStatusMessageType::WARNING);
 		}
+#else
+		// System audio input is not supported on non-Windows platforms yet
+		SetNodeStatusMessageIfChanged("System audio input is not supported on this platform yet", fb::NodeStatusMessageType::FAILURE);
+		return NOS_RESULT_FAILED;
 #endif
 
 		uint64_t deltaNumerator = pins.FixedStepTiming.DeltaSeconds.x;
