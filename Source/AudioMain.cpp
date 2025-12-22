@@ -20,6 +20,7 @@ enum class Nodes : int
 	UnpackAudioBuffer,
 	Resample,
 	AudioOscilloscope,
+	SystemAudioInput,
 	Count
 };
 
@@ -29,6 +30,7 @@ nosResult RegisterAudioPlayerNode(nosNodeFunctions*);
 nosResult RegisterUnpackAudioBufferNode(nosNodeFunctions*);
 nosResult RegisterResampleNode(nosNodeFunctions*);
 nosResult RegisterAudioOscilloscopeNode(nosNodeFunctions*);
+nosResult RegisterSystemAudioInputNode(nosNodeFunctions*);
 
 struct AudioPluginFunctions : nos::PluginFunctions
 {
@@ -45,6 +47,7 @@ struct AudioPluginFunctions : nos::PluginFunctions
 		NOS_RETURN_ON_FAILURE(RegisterUnpackAudioBufferNode(outList[(int)Nodes::UnpackAudioBuffer]))
 		NOS_RETURN_ON_FAILURE(RegisterResampleNode(outList[(int)Nodes::Resample]))
 		NOS_RETURN_ON_FAILURE(RegisterAudioOscilloscopeNode(outList[(int)Nodes::AudioOscilloscope]))
+		NOS_RETURN_ON_FAILURE(RegisterSystemAudioInputNode(outList[(int)Nodes::SystemAudioInput]))
 		return NOS_RESULT_SUCCESS;
 	}
 };
