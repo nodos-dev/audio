@@ -297,29 +297,21 @@ struct SystemAudioInputNode : NodeContext
 								 [this](const bool* newVal, std::optional<const bool*> oldVal) {
 									 Active = *newVal;
 									 if (Active)
-									 {
 										 SetNodeStatusMessageIfChanged("System audio input active", fb::NodeStatusMessageType::INFO);
-									 }
 									 else
-									 {
 										 SetNodeStatusMessageIfChanged("System audio input inactive", fb::NodeStatusMessageType::WARNING);
-									 }
 								 });
 
 		AddPinValueWatcher<uint32_t>(NOS_NAME("SampleRate"),
 								 [this](const uint32_t* newVal, std::optional<const uint32_t*> oldVal) {
 									 if (!oldVal || *newVal != **oldVal)
-									 {
 										 NeedsReinitialize = true;
-									 }
 								 });
 
 		AddPinValueWatcher<uint8_t>(NOS_NAME("ChannelCount"),
 								 [this](const uint8_t* newVal, std::optional<const uint8_t*> oldVal) {
 									 if (!oldVal || *newVal != **oldVal)
-									 {
 										 NeedsReinitialize = true;
-									 }
 								 });
 
 		return NOS_RESULT_SUCCESS;
@@ -344,13 +336,9 @@ struct SystemAudioInputNode : NodeContext
 		NeedsReinitialize = true;
 		
 		if (Active)
-		{
 			SetNodeStatusMessageIfChanged("System audio input active", fb::NodeStatusMessageType::INFO);
-		}
 		else
-		{
 			SetNodeStatusMessageIfChanged("System audio input inactive", fb::NodeStatusMessageType::WARNING);
-		}
 	}
 
 	void OnPathStop() override
@@ -489,13 +477,9 @@ struct SystemAudioInputNode : NodeContext
 				std::string deviceSuffix = deviceName.empty() ? "" : " - " + deviceName;
 				
 				if (hasAudio)
-				{
 					SetNodeStatusMessageIfChanged("Capturing audio" + deviceSuffix, fb::NodeStatusMessageType::INFO);
-				}
 				else
-				{
 					SetNodeStatusMessageIfChanged("Audio capture is ready" + deviceSuffix, fb::NodeStatusMessageType::INFO);
-				}
 			}
 			else
 #endif
