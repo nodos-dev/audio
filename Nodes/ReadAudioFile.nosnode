@@ -1,4 +1,5 @@
 {
+	"schema_version": "1.4-v1",
 	"nodes": [
 		{
 			"class_name": "ReadAudioFile",
@@ -18,7 +19,9 @@
 						"visualizers": [
 							{
 								"type": "FILE_PICKER",
-								"file_extensions": [ "wav" ],
+								"file_extensions": [
+									"wav"
+								],
 								"file_picker_type": "OPEN"
 							}
 						]
