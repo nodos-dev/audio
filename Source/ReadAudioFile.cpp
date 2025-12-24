@@ -2,10 +2,10 @@
 
 #include <Nodos/Plugin.hpp>
 
-#include <nosVulkanSubsystem/Helpers.hpp>
+#include <nosSysVulkan/Helpers.hpp>
 #include <cmath>
 
-#include "Audio_generated.h"
+#include "nosAudio/Audio_generated.h"
 
 // AudioFile.h defines it without checking if it was defined before.
 #ifdef NOMINMAX
