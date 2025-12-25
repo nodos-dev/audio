@@ -1,5 +1,4 @@
 {
-	"schema_version": "1.4-v1",
 	"nodes": [
 		{
 			"class_name": "ReadAudioFile",
@@ -44,5 +43,6 @@
 				"functions": []
 			}
 		}
-	]
+	],
+	"schema_version": "1.4-v1"
 }

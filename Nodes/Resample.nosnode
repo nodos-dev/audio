@@ -1,5 +1,4 @@
 {
-	"schema_version": "1.4-v1",
 	"nodes": [
 		{
 			"class_name": "Resample",
@@ -46,5 +45,6 @@
 				]
 			}
 		}
-	]
+	],
+	"schema_version": "1.4-v1"
 }

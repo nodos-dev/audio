@@ -2,7 +2,7 @@
 
 #include <Nodos/Plugin.hpp>
 
-#include <nosVulkanSubsystem/Helpers.hpp>
+#include <nosSysVulkan/Helpers.hpp>
 #include <cmath>
 #include <vector>
 #include <mutex>

@@ -2,14 +2,14 @@
 
 #include <Nodos/Plugin.hpp>
 
-#include <nosVulkanSubsystem/Helpers.hpp>
+#include <nosSysVulkan/Helpers.hpp>
 #include <cmath>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-#include "Audio_generated.h"
+#include "nosAudio/Audio_generated.h"
 #include "AudioConversions.hpp"
 
 namespace nos::audio
