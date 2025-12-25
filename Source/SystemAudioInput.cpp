@@ -9,7 +9,7 @@
 #include <thread>
 #include <atomic>
 
-#include "Audio_generated.h"
+#include "nosAudio/Audio_generated.h"
 #include "AudioConversions.hpp"
 
 #ifdef _WIN32
