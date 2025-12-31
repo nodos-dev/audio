@@ -10,7 +10,7 @@
 #endif
 
 #include "nosAudio/Audio_generated.h"
-#include "AudioConversions.hpp"
+#include "nosAudio/AudioConversions.hpp"
 
 namespace nos::audio
 {

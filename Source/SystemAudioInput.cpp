@@ -9,8 +9,8 @@
 #include <thread>
 #include <atomic>
 
-#include "nosAudio/Audio_generated.h"
-#include "AudioConversions.hpp"
+#include "Audio_generated.h"
+#include "nosAudio/AudioConversions.hpp"
 
 #ifdef _WIN32
 #include <Windows.h>
