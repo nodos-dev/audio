@@ -154,7 +154,7 @@ public:
 
 	bool ReadSamples(int32_t* outBuffer, uint32_t numSamples, uint8_t targetChannels, float gain)
 	{
-		std::lock_guard<std::mutex> lock(BufferMutex);
+		std::unique_lock lock(BufferMutex);
 
 		// Calculate how many source samples we need
 		float sampleRateRatio = static_cast<float>(SourceSampleRate) / static_cast<float>(TargetSampleRate);

@@ -3,7 +3,7 @@
 		{
 			"class_name": "ReadAudioFile",
 			"menu_info": {
-				"category": "Media|Advanced",
+				"category": "Media",
 				"display_name": "Read Audio File"
 			},
 			"node": {
