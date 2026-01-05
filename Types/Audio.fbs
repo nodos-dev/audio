@@ -1,3 +1,5 @@
+include "Types/Types.fbs";
+
 namespace nos.audio;
 
 enum BitDepth: uint
@@ -12,4 +14,10 @@ struct AudioPacketDescriptor
     bit_depth: BitDepth;
     sample_stride: uint; // Number of bytes from one sample to another sample
     channel_count: uint; // Number of audio channels, each channel has its own sample in the packet and they are interleaved 
+}
+
+struct AudioPacket
+{
+    desc: AudioPacketDescriptor;
+    buffer: nos.sys.vulkan.Buffer;
 }

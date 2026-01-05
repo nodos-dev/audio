@@ -1,57 +1,70 @@
 {
-    "nodes": [
-        {
-            "class_name": "AudioPlayer",
-            "menu_info": {
-                "category": "Audio",
-                "display_name": "Audio Player"
-            },
-            "node": {
-                "class_name": "AudioPlayer",
-                "contents_type": "Job",
-                "always_execute": true,
-                "pins": [
-                    {
-                        "name": "InputAudioPacketDescriptor",
-                        "type_name": "nos.audio.AudioPacketDescriptor",
-                        "show_as": "INPUT_PIN",
-                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
-                    },
-                    {
-                        "name": "Input",
-                        "type_name": "nos.sys.vulkan.Buffer",
-                        "show_as": "INPUT_PIN",
-                        "can_show_as": "INPUT_PIN_OR_PROPERTY"
-                    },
-                    {
-                        "name": "TargetSampleRate",
-                        "type_name": "uint",
-                        "show_as": "PROPERTY",
-                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                        "data": 48000
-                    },
-                    {
-                        "name": "SoundBoost",
-                        "type_name": "float",
-                        "show_as": "PROPERTY",
-                        "can_show_as": "INPUT_PIN_OR_PROPERTY",
-                        "data": 1.0
-                    },
-                    {
-                        "name": "OutputAudioPacketDescriptor",
-                        "type_name": "nos.audio.AudioPacketDescriptor",
-                        "show_as": "OUTPUT_PIN",
-                        "can_show_as": "OUTPUT_PIN_ONLY"
-                    },
-                    {
-                        "name": "Output",
-                        "type_name": "nos.sys.vulkan.Buffer",
-                        "show_as": "OUTPUT_PIN",
-                        "can_show_as": "OUTPUT_PIN_ONLY"
-                    }
-                ]
-            }
-        }
-    ],
-    "schema_version": "1.4-v1"
+	"nodes": [
+		{
+			"class_name": "AudioPlayer",
+			"menu_info": {
+				"category": "Audio",
+				"display_name": "Audio Player"
+			},
+			"node": {
+				"class_name": "AudioPlayer",
+				"contents_type": "Job",
+				"always_execute": true,
+				"pins": [
+					{
+						"name": "FullAudio",
+						"display_name": "Full Audio",
+						"type_name": "nos.audio.AudioPacket",
+						"show_as": "INPUT_PIN",
+						"can_show_as": "INPUT_PIN_ONLY"
+					},
+					{
+						"name": "TargetSampleRate",
+						"display_name": "Target Sample Rate",
+						"type_name": "uint",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": 48000
+					},
+					{
+						"name": "SoundBoost",
+						"display_name": "Sound Boost",
+						"type_name": "float",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": 1.0
+					},
+					{
+						"name": "AudioPacket",
+						"display_name": "Audio Packet",
+						"type_name": "nos.audio.AudioPacket",
+						"show_as": "OUTPUT_PIN",
+						"can_show_as": "OUTPUT_PIN_ONLY"
+					},
+					{
+						"name": "RewindPlaybackOnPathStart",
+						"display_name": "Rewind Playback On Path Start",
+						"description": "If enabled, the audio playback cursor will reset to the beginning whenever the node path is started.",
+						"type_name": "bool",
+						"show_as": "PROPERTY",
+						"can_show_as": "INPUT_PIN_OR_PROPERTY",
+						"data": true
+					},
+					{
+						"name": "Progress",
+						"display_name": "Progress",
+						"description": "Shows the progress of the playback between 0 and 1.",
+						"type_name": "float",
+						"show_as": "PROPERTY",
+						"can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+						"readonly": true,
+						"data": 0.0,
+						"min": 0.0,
+						"max": 1.0
+					}
+				]
+			}
+		}
+	],
+	"schema_version": "1.4-v1"
 }

@@ -10,7 +10,7 @@
 #endif
 
 #include "nosAudio/Audio_generated.h"
-#include "AudioConversions.hpp"
+#include "nosAudio/AudioConversions.hpp"
 
 namespace nos::audio
 {
@@ -26,12 +26,44 @@ struct ResampleNode : NodeContext
 		// Reset any state if needed
 	}
 	
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	nosResult ExecuteNode(NodeExecuteParams const& pins) override
 	{
-		auto pins = nos::NodeExecuteParams(params);
-		auto inputBuf = pins.GetPinData<vkss::BufferPinData>(NOS_NAME("InputAudio"));
+		// Get input audio packet
+		auto inputAudioPacket = pins.GetPinObject<CompositeObjectRef>(NOS_NAME("InputAudioPacket"));
+		if (!inputAudioPacket)
+			return NOS_RESULT_FAILED;
+		
+		// Extract descriptor and buffer from the composite AudioPacket
+		auto descObj = inputAudioPacket.GetField<PrimitiveObjectRef>(NOS_NAME("desc"));
+		if (!descObj)
+			return NOS_RESULT_FAILED;
+		
+		auto descBuffer = descObj->GetObjectDataView();
+		if (auto* err = descBuffer.Error())
+			return *err;
+		
+		auto& inputPacketDesc = *static_cast<const AudioPacketDescriptor*>((*descBuffer).Data);
+		
+		auto inputBufObj = inputAudioPacket.GetField(NOS_NAME("buffer"));
+		if (!inputBufObj)
+			return NOS_RESULT_FAILED;
 
-		auto& inputPacketDesc = *pins.GetPinData<AudioPacketDescriptor>(NOS_NAME("InputAudioPacketDescriptor"));
+		auto requiredInputAudioBufferSize =
+			inputPacketDesc.num_samples() * sizeof(uint32_t) * inputPacketDesc.channel_count();
+		auto inputAudioBufferInfo = sys::vulkan::GetResourceInfo(*inputBufObj);
+		if (!inputAudioBufferInfo)
+		{
+			nosEngine.LogE("%s: Failed to get input audio buffer info.",
+						   nos::GetItemPath(NodeId).value_or("<unknown>").c_str());
+			return NOS_RESULT_SUCCESS;
+		}
+		if (inputAudioBufferInfo->Buffer.Size < requiredInputAudioBufferSize)
+		{
+			nosEngine.LogE("%s: Input audio buffer size is smaller than expected.",
+						   nos::GetItemPath(NodeId).value_or("<unknown>").c_str());
+			return NOS_RESULT_SUCCESS;
+		}
+
 		auto& outputSampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("OutputSampleRate"));
 		auto& outputChannelCount = *pins.GetPinData<uint32_t>(NOS_NAME("OutputChannelCount"));
 
@@ -41,33 +73,28 @@ struct ResampleNode : NodeContext
 
 		// Create or resize output audio buffer only if needed
 		size_t requiredBufferSize = outputNumSamples * sizeof(uint32_t) * outputChannelCount;
-		size_t allocatedBufferSize = OutputAudio ? OutputAudio->Info.Buffer.Size : 0;
+		size_t allocatedBufferSize = OutputAudio ? sys::vulkan::GetResourceInfo(OutputAudio)->Size : 0;
 		
 		if (!OutputAudio || requiredBufferSize > allocatedBufferSize)
 		{
-			OutputAudio = std::nullopt;
+			OutputAudio = {};
 			
 			// Allocate 1.1x the required size to reduce frequency of reallocations
-			size_t newBufferSize = static_cast<size_t>(requiredBufferSize * 1.1f);
+			size_t newBufferSize = requiredBufferSize * 1.1f;
 			
 			nosBufferInfo audioBufferDesc = {};
 			audioBufferDesc.Size = static_cast<uint32_t>(newBufferSize);
 			audioBufferDesc.Usage = nosBufferUsage(NOS_BUFFER_USAGE_STORAGE_BUFFER | NOS_BUFFER_USAGE_TRANSFER_DST | NOS_BUFFER_USAGE_TRANSFER_SRC);
 			audioBufferDesc.MemoryFlags = nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE | NOS_MEMORY_FLAGS_FORCE_HOST_MEMORY);
 			audioBufferDesc.ElementType = NOS_BUFFER_ELEMENT_TYPE_INT32;
-			audioBufferDesc.FieldType = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
 			
-			OutputAudio = vkss::Resource::Create(audioBufferDesc, "Resample AudioBuffer");
+			OutputAudio = sys::vulkan::CreateBuffer(audioBufferDesc, "Resample AudioBuffer");
 			if (!OutputAudio)
-				return NOS_RESULT_SUCCESS;
-
-			nos::Buffer audioPacketPinData = OutputAudio->ToPinData();
-			SetPinValue(NOS_NAME("OutputAudio"), audioPacketPinData);
+				return NOS_RESULT_FAILED;
 		}
 		
-		nosResourceShareInfo& outputBufDesc = *OutputAudio;
-		int32_t* outputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(&outputBufDesc));
-		int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(&inputBuf));
+		int32_t* outputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(OutputAudio));
+		int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(*inputBufObj));
 		
 		if (!outputAudioSamples || !inputAudioSamples)
 		{
@@ -93,8 +120,7 @@ struct ResampleNode : NodeContext
 			
 			for (uint32_t outputChannel = 0; outputChannel < outputChannelCount; ++outputChannel)
 			{
-				float outputSampleValue = 0.0f;
-				
+				float outputSampleValue;
 				if (outputChannel < inputPacketDesc.channel_count())
 				{
 					int32_t currentSample = inputAudioSamples[inputSampleIndex * inputPacketDesc.channel_count() + outputChannel];
@@ -126,14 +152,23 @@ struct ResampleNode : NodeContext
 		// Create output audio packet descriptor
 		AudioPacketDescriptor outputPacketDesc(
 			outputSampleRate, outputNumSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, sizeof(int32_t), outputChannelCount);
-		
-		// Set output pin values
-		SetPinValue(NOS_NAME("OutputAudioPacketDescriptor"), outputPacketDesc);
-		
+
+		auto newDescObj = PrimitiveObjectRef::Create(
+			NOS_NAME("nos.audio.AudioPacketDescriptor"),
+			nos::Buffer::From(outputPacketDesc));
+
+		std::unordered_map<nos::Name, nos::ObjectRef> audioPacketFields;
+		audioPacketFields[NOS_NAME("desc")] = newDescObj.value_or(ObjectRef());
+		audioPacketFields[NOS_NAME("buffer")] = OutputAudio;
+		auto audioPacket = CompositeObjectRef::Create(NOS_NAME("nos.audio.AudioPacket"), audioPacketFields);
+		if (!audioPacket)
+			return NOS_RESULT_FAILED;
+
+		SetPinObject(NOS_NAME("OutputAudioPacket"), *audioPacket);
 		return NOS_RESULT_SUCCESS;
 	}
 
-	std::optional<vkss::Resource> OutputAudio = std::nullopt;
+	TypedObjectRef<sys::vulkan::Buffer> OutputAudio;
 };
 
 nosResult RegisterResampleNode(nosNodeFunctions* fn)

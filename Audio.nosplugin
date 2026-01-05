@@ -2,14 +2,14 @@
 	"info": {
 		"id": {
 			"name": "nos.audio",
-			"version": "0.3.0"
+			"version": "1.0.0"
 		},
 		"description": "Nodos plugin for audio processing.",
 		"display_name": "Audio",
 		"dependencies": [
 			{
 				"name": "nos.sys.vulkan",
-				"version": "7.1"
+				"version": "8.0"
 			}
 		],
 		"category": "Audio"
@@ -22,5 +22,6 @@
 			"path": "Config/Resources.json"
 		}
 	],
-	"sdk_version": "40.0"
+	"sdk_version": "41.0",
+	"schema_version": "1.4-v1"
 }

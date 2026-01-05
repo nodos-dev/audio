@@ -10,7 +10,7 @@
 #endif
 
 #include "nosAudio/Audio_generated.h"
-#include "AudioConversions.hpp"
+#include "nosAudio/AudioConversions.hpp"
 
 namespace nos::audio
 {
@@ -24,11 +24,10 @@ struct UnpackAudioBuffer : NodeContext
 	void OnPathStart() override
 	{
 	}
-	
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+
+	nosResult ExecuteNode(NodeExecuteParams const& pins) override
 	{
-		auto pins = nos::NodeExecuteParams(params);
-		auto inputBuf = pins.GetPinData<vkss::BufferPinData>(NOS_NAME("PrefixedAudioBuffer"));
+		auto inputBuf = pins.GetPinObject<sys::vulkan::Buffer>(NOS_NAME("PrefixedAudioBuffer"));
 
 		// Wait GPU
 		nosCmd cmd{};
@@ -49,7 +48,7 @@ struct UnpackAudioBuffer : NodeContext
 		nosVulkan->WaitGpuEvent(&waitHandle, UINT64_MAX);
 
 		// Map the input buffer to read the prefixed data
-		uint8_t* inputData = reinterpret_cast<uint8_t*>(nosVulkan->Map(&inputBuf));
+		uint8_t* inputData = nosVulkan->Map(inputBuf);
 		if (!inputData)
 			return NOS_RESULT_SUCCESS;
 
@@ -66,32 +65,27 @@ struct UnpackAudioBuffer : NodeContext
 		
 		// Create or resize audio buffer only if needed (with 1.1x headroom to avoid frequent reallocations)
 		size_t requiredBufferSize = std::max(size_t(numSamples * sizeof(uint32_t) * channelCount), size_t(1000));
-		size_t allocatedBufferSize = OutputAudioPacket ? OutputAudioPacket->Info.Buffer.Size : 0;
+		size_t allocatedBufferSize = OutputAudioBuffer ? sys::vulkan::GetResourceInfo(OutputAudioBuffer)->Size : 0;
 		
-		if (!OutputAudioPacket || requiredBufferSize > allocatedBufferSize)
+		if (!OutputAudioBuffer || requiredBufferSize > allocatedBufferSize)
 		{
-			OutputAudioPacket = std::nullopt;
+			OutputAudioBuffer = {};
 			
 			// Allocate 1.1x the required size to reduce frequency of reallocations
-			size_t newBufferSize = static_cast<size_t>(requiredBufferSize * 1.1f);
+			size_t newBufferSize = requiredBufferSize * 1.1f;
 			
 			nosBufferInfo audioBufferDesc = {};
 			audioBufferDesc.Size = static_cast<uint32_t>(newBufferSize);
 			audioBufferDesc.Usage = nosBufferUsage(NOS_BUFFER_USAGE_STORAGE_BUFFER | NOS_BUFFER_USAGE_TRANSFER_DST | NOS_BUFFER_USAGE_TRANSFER_SRC);
 			audioBufferDesc.MemoryFlags = nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE);
 			audioBufferDesc.ElementType = NOS_BUFFER_ELEMENT_TYPE_INT32;
-			audioBufferDesc.FieldType = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
 			
-			OutputAudioPacket = vkss::Resource::Create(audioBufferDesc, "Unpacked Audio Buffer");
-			if (!OutputAudioPacket)
+			OutputAudioBuffer = sys::vulkan::CreateBuffer(audioBufferDesc, "Unpacked Audio Buffer");
+			if (!OutputAudioBuffer)
 				return NOS_RESULT_SUCCESS;
-
-			nos::Buffer audioPacketPinData = OutputAudioPacket->ToPinData();
-			SetPinValue(NOS_NAME("Audio"), audioPacketPinData);
 		}
 		
-		nosResourceShareInfo& audioBufDesc = *OutputAudioPacket;
-		int32_t* outputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(&audioBufDesc));
+		int32_t* outputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(OutputAudioBuffer));
 		if (!outputAudioSamples)
 			return NOS_RESULT_SUCCESS;
 		
@@ -107,14 +101,22 @@ struct UnpackAudioBuffer : NodeContext
 		
 		AudioPacketDescriptor audioPacketDesc(
 			sampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, 4, channelCount);
-		
-		// Set output pin values
-		SetPinValue(NOS_NAME("AudioPacketDescriptor"), audioPacketDesc);
-		
+
+		auto newDescObj = PrimitiveObjectRef::Create(NOS_NAME("nos.audio.AudioPacketDescriptor"), nos::Buffer::From(audioPacketDesc));
+
+		std::unordered_map<nos::Name, nos::ObjectRef> audioPacketFields;
+		audioPacketFields[NOS_NAME("desc")] = newDescObj.value_or(ObjectRef());
+		audioPacketFields[NOS_NAME("buffer")] = OutputAudioBuffer;
+		auto audioPacket = CompositeObjectRef::Create(NOS_NAME("nos.audio.AudioPacket"), audioPacketFields);
+		if (!audioPacket)
+			return NOS_RESULT_FAILED;
+
+		SetPinObject(NOS_NAME("Audio"), *audioPacket);
+
 		return NOS_RESULT_SUCCESS;
 	}
 
-	std::optional<vkss::Resource> OutputAudioPacket = std::nullopt;
+	TypedObjectRef<sys::vulkan::Buffer> OutputAudioBuffer;
 };
 
 nosResult RegisterUnpackAudioBufferNode(nosNodeFunctions* fn)

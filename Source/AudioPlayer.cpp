@@ -10,27 +10,50 @@
 #endif
 
 #include "nosAudio/Audio_generated.h"
-#include "AudioConversions.hpp"
+#include "nosAudio/AudioConversions.hpp"
 
 namespace nos::audio
 {
 struct AudioPlayerNode : NodeContext
 {
-	nosResult OnCreate(nosFbNodePtr) override { return NOS_RESULT_SUCCESS; }
+	nosResult OnCreate(nosFbNodePtr) override
+	{
+		AddPinValueWatcher<bool>(NOS_NAME("RewindPlaybackOnPathStart"),
+								 [this](const bool* newVal, std::optional<const bool*> oldVal) {
+									 RewindPlaybackOnPathStart = *newVal;
+								 });
+		return NOS_RESULT_SUCCESS;
+	}
+
+	std::string ProgressStatusString;
 
 	void OnPathStart() override
 	{
-		AccumulatedSampleNumerator = 0;
-		LastSampleTime = 0;
-		LastSampleTimeFract = 0.0f;
+		ClearNodeStatusMessages();
+		if (RewindPlaybackOnPathStart)
+		{
+			AccumulatedSampleNumerator = 0;
+			LastSampleTime = 0;
+			LastSampleTimeFract = 0.0f;
+		}
 	}
 
-	nosResult ExecuteNode(nosNodeExecuteParams* params) override
+	nosResult ExecuteNode(NodeExecuteParams const& pins) override
 	{
-		auto pins = nos::NodeExecuteParams(params);
-		auto inputBuf = pins.GetPinData<vkss::BufferPinData>(NOS_NAME("Input"));
+		auto fullAudio = pins.GetPinObject(NOS_NAME("FullAudio"));
 		
-		auto& inputPacketDesc = *pins.GetPinData<AudioPacketDescriptor>(NOS_NAME("InputAudioPacketDescriptor"));
+		ObjectRef desc{}, buf{};
+		nosEngine.ObjectAPI->GetField(fullAudio, NOS_NAME("desc"), &desc.GetStorage());
+		nosEngine.ObjectAPI->GetField(fullAudio, NOS_NAME("buffer"), &buf.GetStorage());
+
+		if (!desc || !buf)
+			return NOS_RESULT_FAILURE;
+
+		nosImmutableBuffer descBuf{};
+		if (NOS_RESULT_SUCCESS != nosEngine.ObjectAPI->GetObjectDataView(desc, &descBuf))
+			return NOS_RESULT_FAILURE;
+
+		auto& inputPacketDesc = *static_cast<const AudioPacketDescriptor*>(descBuf.Data);
 		auto& soundBoost = *pins.GetPinData<float>(NOS_NAME("SoundBoost"));
 		auto& targetSampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("TargetSampleRate"));
 		auto inputSampleRate = inputPacketDesc.sample_rate();
@@ -54,16 +77,23 @@ struct AudioPlayerNode : NodeContext
 		uint32_t numSamples = static_cast<uint32_t>(AccumulatedSampleNumerator / deltaDenominator);
 		AccumulatedSampleNumerator %= deltaDenominator; // Keep remainder for next frame
 
-		// Create or resize audio buffer only if needed (with 1.5x headroom to avoid frequent reallocations)
+		// Create or resize audio buffer only if needed (with 1.1x headroom to avoid frequent reallocations)
 		size_t requiredBufferSize = numSamples * sizeof(uint32_t) * inputPacketDesc.channel_count();
-		size_t allocatedBufferSize = OutputAudio ? OutputAudio->Info.Buffer.Size : 0;
+		size_t allocatedBufferSize = 0;
+		if (OutputAudio)
+		{
+			if (auto bufferInfo = sys::vulkan::GetResourceInfo(OutputAudio))
+				allocatedBufferSize = bufferInfo->Size;
+			else
+				NOS_SOFT_CHECK(false, "Failed to get buffer info for existing audio buffer");
+		}
 
 		if (!OutputAudio || requiredBufferSize > allocatedBufferSize)
 		{
-			OutputAudio = std::nullopt;
+			OutputAudio = {};
 
-			// Allocate 1.5x the required size to reduce frequency of reallocations
-			size_t newBufferSize = static_cast<size_t>(requiredBufferSize * 1.5f);
+			// Allocate 1.1x the required size to reduce frequency of reallocations
+			size_t newBufferSize = requiredBufferSize * 1.1f;
 
 			nosBufferInfo audioBufferDesc = {};
 			audioBufferDesc.Size = static_cast<uint32_t>(newBufferSize);
@@ -72,19 +102,14 @@ struct AudioPlayerNode : NodeContext
 			audioBufferDesc.MemoryFlags =
 				nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE | NOS_MEMORY_FLAGS_FORCE_HOST_MEMORY);
 			audioBufferDesc.ElementType = NOS_BUFFER_ELEMENT_TYPE_INT32;
-			audioBufferDesc.FieldType = NOS_TEXTURE_FIELD_TYPE_PROGRESSIVE;
 
-			OutputAudio = vkss::Resource::Create(audioBufferDesc, "AudioPlayer AudioBuffer");
+			OutputAudio = sys::vulkan::CreateBuffer(audioBufferDesc, "AudioPlayer AudioBuffer");
 			if (!OutputAudio)
 				return NOS_RESULT_FAILED;
-
-			nos::Buffer audioPacketPinData = OutputAudio->ToPinData();
-			SetPinValue(NOS_NAME("Output"), audioPacketPinData);
 		}
 
-		nosResourceShareInfo& audioBufDesc = *OutputAudio;
-		int32_t* outAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(&audioBufDesc));
-		int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(&inputBuf));
+		int32_t* outAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(OutputAudio));
+		int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(buf));
 		if (!outAudioSamples)
 		{
 			return NOS_RESULT_FAILED;
@@ -122,16 +147,56 @@ struct AudioPlayerNode : NodeContext
 		AudioPacketDescriptor audioPacketDesc(
 			targetSampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, sizeof(int32_t), inputPacketDesc.channel_count());
 
+		ObjectRef outDesc{};
+		nosEngine.ObjectAPI->CreatePrimitiveObject(NOS_NAME(AudioPacketDescriptor::GetFullyQualifiedName()), nos::Buffer::From(audioPacketDesc), &outDesc.GetStorage());
+		
+		ObjectRef out{};
+		std::vector<nosCompositeObjectField> fields;
+		fields.push_back(nosCompositeObjectField{
+			.FieldName = NOS_NAME("desc"),
+			.FieldObjectId = outDesc,
+		});
+		fields.push_back(nosCompositeObjectField{
+			.FieldName = NOS_NAME("buffer"),
+			.FieldObjectId = OutputAudio,
+		});
+		nosEngine.ObjectAPI->CreateCompositeObject(NOS_NAME(AudioPacket::GetFullyQualifiedName()), fields.data(), fields.size(), &out.GetStorage());
+		
+		NOS_SOFT_CHECK(out, "Failed to create output AudioPacket object");
+
+		// Calculate and set progress (0.0 to 1.0)
+		float progress = 0.0f;
+		if (inputPacketDesc.num_samples() > 0)
+		{
+			// Calculate the current sample position in the input audio
+			float targetSampleTimeFract = LastSampleTimeFract;
+			uint64_t currentSamplePosition = LastSampleTime * inputSampleRate + static_cast<uint64_t>(targetSampleTimeFract * inputSampleRate);
+			currentSamplePosition %= inputPacketDesc.num_samples();
+			progress = static_cast<float>(currentSamplePosition) / static_cast<float>(inputPacketDesc.num_samples());
+		}
+
 		// Set output pin values
-		SetPinValue(NOS_NAME("OutputAudioPacketDescriptor"), audioPacketDesc);
+		SetPinObject(NOS_NAME("AudioPacket"), out);
+		SetPinValue(NOS_NAME("Progress"), progress);
+
+		float progressSegmentLength = 0.01f;
+		progress = std::floor(progress / progressSegmentLength) * progressSegmentLength;
+		
+		std::string newProgressStatusString = "Playback Progress: " + std::to_string(static_cast<int>(progress * 100.0f)) + "%";
+		if (newProgressStatusString != ProgressStatusString)
+		{
+			SetNodeStatusMessage(newProgressStatusString, fb::NodeStatusMessageType::INFO);
+			ProgressStatusString = newProgressStatusString;
+		}
 
 		return NOS_RESULT_SUCCESS;
 	}
 
-	std::optional<vkss::Resource> OutputAudio = std::nullopt;
-	uint64_t AccumulatedSampleNumerator; // Accumulates fractional samples as integer numerator
+	TypedObjectRef<sys::vulkan::Buffer> OutputAudio;
+	uint64_t AccumulatedSampleNumerator = 0; // Accumulates fractional samples as integer numerator
 	uint64_t LastSampleTime = 0;
 	float LastSampleTimeFract = 0.0f;
+	bool RewindPlaybackOnPathStart = false;
 };
 
 nosResult RegisterAudioPlayerNode(nosNodeFunctions* fn)
