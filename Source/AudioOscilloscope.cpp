@@ -1,5 +1,8 @@
 // Copyright MediaZ Teknoloji A.S. All Rights Reserved.
 
+#define NOS_DISABLE_DEPRECATED 1
+
+
 #include <Nodos/Plugin.hpp>
 #include <nosSysVulkan/Helpers.hpp>
 #include <cmath>
@@ -14,11 +17,16 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#if !NOS_DISABLE_DEPRECATED
+#error wtf
+#endif
+
 namespace nos::audio
 {
 
 struct AudioOscilloscopeNode : NodeContext
 {
+	AudioOscilloscopeNode() = default;
 	nosResult OnCreate(nosFbNodePtr) override
 	{
 		StartTime = std::chrono::high_resolution_clock::now();
@@ -208,6 +216,7 @@ struct AudioOscilloscopeNode : NodeContext
 
 nosResult RegisterAudioOscilloscopeNode(nosNodeFunctions* fn)
 {
+	static_assert(std::is_constructible_v<AudioOscilloscopeNode>);
 	NOS_BIND_NODE_CLASS(NOS_NAME("AudioOscilloscope"), AudioOscilloscopeNode, fn);
 	return NOS_RESULT_SUCCESS;
 }

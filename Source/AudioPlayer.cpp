@@ -1,5 +1,9 @@
 // Copyright MediaZ Teknoloji A.S. All Rights Reserved.
 
+
+#define NOS_DISABLE_DEPRECATED 1
+
+
 #include <Nodos/Plugin.hpp>
 
 #include <nosSysVulkan/Helpers.hpp>
@@ -16,6 +20,8 @@ namespace nos::audio
 {
 struct AudioPlayerNode : NodeContext
 {
+	AudioPlayerNode() = default;
+
 	nosResult OnCreate(nosFbNodePtr) override
 	{
 		AddPinValueWatcher<bool>(NOS_NAME("RewindPlaybackOnPathStart"),

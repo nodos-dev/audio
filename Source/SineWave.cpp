@@ -1,5 +1,8 @@
 // Copyright MediaZ Teknoloji A.S. All Rights Reserved.
 
+
+#define NOS_DISABLE_DEPRECATED 1
+
 #include <Nodos/Plugin.hpp>
 
 #include <nosSysVulkan/Helpers.hpp>
