@@ -14,8 +14,8 @@ on:
           - If Changed
           - Force
           - None
-      plugin_name:
-        description: 'Single plugin name (optional)'
+      plugin_names:
+        description: 'Publish only these plugins (semicolon-delimited) (optional)'
         required: false
         default: ''
         type: string
@@ -44,6 +44,15 @@ on:
         required: false
         default: true
         type: boolean
+      version_check:
+        description: 'Version Check'
+        required: true
+        default: 'strict'
+        type: choice
+        options:
+          - none
+          - loose
+          - strict
 
 run-name: >-
   ${{ ((github.event_name == 'push') && format('Build Only: {0}', github.event.head_commit.message)) ||
@@ -56,22 +65,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  set-build-number:
-    name: Set Build Number
-    runs-on: self-hosted
-    outputs:
-      build_number: ${{ steps.offset-build-number.outputs.build_number }}
-    steps:
-      - name: Offset Build Number
-        id: offset-build-number
-        shell: bash
-        run: |
-          BUILD_NUMBER=$(( ${{ github.run_number }} + 0 ))
-          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
-
   call-release-plugins:
     name: Build
-    needs: set-build-number
     uses: nodos-dev/actions/.github/workflows/plugins.yml@main
     secrets:
       CI_TOKEN: ${{ secrets.CI_TOKEN }}
@@ -79,10 +74,11 @@ jobs:
     with:
       ref_name: ${{ github.ref_name }}
       publish_mode: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.publish_mode || 'None' }}
-      plugin_name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.plugin_name || '' }}
+      plugin_names: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.plugin_names || '' }}
       clean: ${{ github.event_name == 'workflow_dispatch' && fromJson(github.event.inputs.clean) || false }}
-      build_number: ${{ needs.set-build-number.outputs.build_number }}
+      build_number: ${{ github.run_number }}
       sign_binaries: ${{github.event_name == 'workflow_dispatch' && fromJson(github.event.inputs.sign_binaries) || false }}
       linux: ${{ github.event_name == 'workflow_dispatch' && fromJson(github.event.inputs.linux) || github.event_name == 'push' }}
       windows: ${{ github.event_name == 'workflow_dispatch' && fromJson(github.event.inputs.windows) || github.event_name == 'push' }}
       run_tests: ${{ github.event_name == 'workflow_dispatch' && fromJson(github.event.inputs.run_tests) || false }}
+      version_check: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version_check || 'strict' }}
