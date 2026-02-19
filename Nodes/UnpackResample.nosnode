@@ -170,7 +170,7 @@
 						{
 							"id": "ab8e664d-7820-4883-ab44-1126d804ef3c",
 							"name": "RingBuffer",
-							"class_name": "nos.utilities.RingBuffer",
+							"class_name": "nos.resource.RingBuffer",
 							"pins": [
 								{
 									"id": "0eeb7449-cccf-4304-a4ce-c191fb9e4fa4",

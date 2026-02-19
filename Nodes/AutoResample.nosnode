@@ -1944,7 +1944,7 @@
 						{
 							"id": "aec8cfa8-8704-46cb-b702-d4e5d6412209",
 							"name": "ShowStatus",
-							"class_name": "nos.utilities.ShowStatus",
+							"class_name": "nos.flow.ShowStatus",
 							"pins": [
 								{
 									"id": "0e04eae6-f958-4f7b-9891-6250815838d6",
