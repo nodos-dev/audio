@@ -170,7 +170,7 @@
 						{
 							"id": "ab8e664d-7820-4883-ab44-1126d804ef3c",
 							"name": "RingBuffer",
-							"class_name": "nos.resource.RingBuffer",
+							"class_name": "nos.reflect.CopyingRingBuffer",
 							"pins": [
 								{
 									"id": "0eeb7449-cccf-4304-a4ce-c191fb9e4fa4",
@@ -186,7 +186,7 @@
 								},
 								{
 									"id": "45e46a86-bb3a-45fb-b60e-8abe84520d65",
-									"name": "Size",
+									"name": "Capacity",
 									"type_name": "uint",
 									"show_as": "INPUT_PIN",
 									"can_show_as": "INPUT_PIN_OR_PROPERTY",

@@ -22,10 +22,6 @@
 			{
 				"name": "nos.reflect",
 				"version": "3.0"
-			},
-			{
-				"name": "nos.resource",
-				"version": "1.0"
 			}
 		],
 		"category": "Audio"
