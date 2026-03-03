@@ -64,8 +64,8 @@ struct ResampleNode : NodeContext
 			return NOS_RESULT_SUCCESS;
 		}
 
-		auto& outputSampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("OutputSampleRate"));
-		auto& outputChannelCount = *pins.GetPinData<uint32_t>(NOS_NAME("OutputChannelCount"));
+		auto& outputSampleRate = *pins.GetPinValue<uint32_t>(NOS_NAME("OutputSampleRate"));
+		auto& outputChannelCount = *pins.GetPinValue<uint32_t>(NOS_NAME("OutputChannelCount"));
 
 		// Calculate the number of output samples based on the input duration and output sample rate
 		float inputDurationSeconds = static_cast<float>(inputPacketDesc.num_samples()) / static_cast<float>(inputPacketDesc.sample_rate());

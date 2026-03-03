@@ -54,8 +54,8 @@ struct AudioPlayerNode : NodeContext
 			return NOS_RESULT_FAILURE;
 
 		auto& inputPacketDesc = *static_cast<const AudioPacketDescriptor*>(descBuf.Data);
-		auto& soundBoost = *pins.GetPinData<float>(NOS_NAME("SoundBoost"));
-		auto& targetSampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("TargetSampleRate"));
+		auto& soundBoost = *pins.GetPinValue<float>(NOS_NAME("SoundBoost"));
+		auto& targetSampleRate = *pins.GetPinValue<uint32_t>(NOS_NAME("TargetSampleRate"));
 		auto inputSampleRate = inputPacketDesc.sample_rate();
 		// Only support fixed step timing
 		if (pins.TimingMode != NOS_EXECUTION_TIMING_MODE_FIXED_STEP)

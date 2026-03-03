@@ -59,7 +59,7 @@ struct ReadAudioFileNode : NodeContext
 	nosResult ExecuteNode(NodeExecuteParams const& pins) override
 	{
 		AudioFile<int32_t> audioFile{};
-		auto path = pins.GetPinData<const char*>(NOS_NAME("Path"));
+		auto path = pins.GetPinValue<const char*>(NOS_NAME("Path"));
 		UpdateStatus(State::Loading, path);
 		if (!audioFile.load(path))
 		{
@@ -76,7 +76,7 @@ struct ReadAudioFileNode : NodeContext
 		std::string audioInfo = audioInfoSS.str();
 		nosEngine.LogI("Audio file read from %s\n%s", path, audioInfo.c_str());
 
-		auto channelCount = *pins.GetPinData<uint32_t>(NOS_NAME("ChannelCount"));
+		auto channelCount = *pins.GetPinValue<uint32_t>(NOS_NAME("ChannelCount"));
 
 		auto bufferObject = sys::vulkan::CreateBuffer(
 			nosBufferInfo{
@@ -88,7 +88,7 @@ struct ReadAudioFileNode : NodeContext
 		if (!bufferObject)
 		{
 			nosEngine.LogE("Failed to create buffer for audio file: %s",
-						   pins.GetPinData<const char*>(NOS_NAME("Path")));
+						   pins.GetPinValue<const char*>(NOS_NAME("Path")));
 			UpdateStatus(State::Failed, path);
 			return NOS_RESULT_FAILED;
 		}

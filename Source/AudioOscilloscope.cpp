@@ -49,14 +49,14 @@ struct AudioOscilloscopeNode : NodeContext
 
 		auto outputTexture = pins.GetPinObject<sys::vulkan::Texture>(NOS_NAME("Output"));
 
-		auto& thickness = *pins.GetPinData<float>(NOS_NAME("Thickness"));
-		auto& amplitude = *pins.GetPinData<float>(NOS_NAME("Amplitude"));
-		auto& intensity = *pins.GetPinData<float>(NOS_NAME("Intensity"));
-		auto& color = *pins.GetPinData<nos::fb::vec4>(NOS_NAME("Color"));
-		auto& audioScale = *pins.GetPinData<float>(NOS_NAME("AudioScale"));
-		auto& glowIntensity = *pins.GetPinData<float>(NOS_NAME("GlowIntensity"));
-		auto& glowFalloff = *pins.GetPinData<float>(NOS_NAME("GlowFalloff"));
-		auto& frameAverage = *pins.GetPinData<uint32_t>(NOS_NAME("FrameAverage"));
+		auto& thickness = *pins.GetPinValue<float>(NOS_NAME("Thickness"));
+		auto& amplitude = *pins.GetPinValue<float>(NOS_NAME("Amplitude"));
+		auto& intensity = *pins.GetPinValue<float>(NOS_NAME("Intensity"));
+		auto& color = *pins.GetPinValue<nos::fb::vec4>(NOS_NAME("Color"));
+		auto& audioScale = *pins.GetPinValue<float>(NOS_NAME("AudioScale"));
+		auto& glowIntensity = *pins.GetPinValue<float>(NOS_NAME("GlowIntensity"));
+		auto& glowFalloff = *pins.GetPinValue<float>(NOS_NAME("GlowFalloff"));
+		auto& frameAverage = *pins.GetPinValue<uint32_t>(NOS_NAME("FrameAverage"));
 
 		// Map input audio buffer
 		int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(inputAudioBuf));

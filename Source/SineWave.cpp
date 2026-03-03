@@ -30,10 +30,10 @@ struct SineWave : NodeContext
 	
 	nosResult ExecuteNode(NodeExecuteParams const& pins) override
 	{
-		auto& waveFrequency = *pins.GetPinData<float>(NOS_NAME("WaveFrequency"));
-		auto& waveAmplitude = *pins.GetPinData<float>(NOS_NAME("WaveAmplitude"));
-		auto& sampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("SampleRate"));
-		uint8_t channelCount = *pins.GetPinData<uint8_t>(NOS_NAME("ChannelCount"));
+		auto& waveFrequency = *pins.GetPinValue<float>(NOS_NAME("WaveFrequency"));
+		auto& waveAmplitude = *pins.GetPinValue<float>(NOS_NAME("WaveAmplitude"));
+		auto& sampleRate = *pins.GetPinValue<uint32_t>(NOS_NAME("SampleRate"));
+		uint8_t channelCount = *pins.GetPinValue<uint8_t>(NOS_NAME("ChannelCount"));
 
 		// Only support fixed step timing
 		if (pins.TimingMode != NOS_EXECUTION_TIMING_MODE_FIXED_STEP) {

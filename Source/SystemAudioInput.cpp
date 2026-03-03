@@ -354,9 +354,9 @@ struct SystemAudioInputNode : NodeContext
 
 	nosResult ExecuteNode(NodeExecuteParams const& pins) override
 	{
-		auto& sampleRate = *pins.GetPinData<uint32_t>(NOS_NAME("SampleRate"));
-		auto& channelCount = *pins.GetPinData<uint8_t>(NOS_NAME("ChannelCount"));
-		auto& gain = *pins.GetPinData<float>(NOS_NAME("Gain"));
+		auto& sampleRate = *pins.GetPinValue<uint32_t>(NOS_NAME("SampleRate"));
+		auto& channelCount = *pins.GetPinValue<uint8_t>(NOS_NAME("ChannelCount"));
+		auto& gain = *pins.GetPinValue<float>(NOS_NAME("Gain"));
 
 		// Only support fixed step timing
 		if (pins.TimingMode != NOS_EXECUTION_TIMING_MODE_FIXED_STEP)
