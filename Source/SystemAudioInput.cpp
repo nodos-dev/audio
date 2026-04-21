@@ -3,282 +3,18 @@
 #include <Nodos/Plugin.hpp>
 
 #include <nosSysVulkan/Helpers.hpp>
-#include <cmath>
-#include <vector>
-#include <mutex>
-#include <thread>
-#include <atomic>
+
+#include <cstdint>
+#include <memory>
+#include <string>
 
 #include "nosAudio/Audio_generated.h"
 #include "nosAudio/AudioConversions.hpp"
 
-#ifdef _WIN32
-#include <Windows.h>
-#include <mmdeviceapi.h>
-#include <Audioclient.h>
-#include <comdef.h>
-#include <functiondiscoverykeys_devpkey.h>
-
-// COM smart pointer helpers
-_COM_SMARTPTR_TYPEDEF(IMMDeviceEnumerator, __uuidof(IMMDeviceEnumerator));
-_COM_SMARTPTR_TYPEDEF(IMMDevice, __uuidof(IMMDevice));
-_COM_SMARTPTR_TYPEDEF(IAudioClient, __uuidof(IAudioClient));
-_COM_SMARTPTR_TYPEDEF(IAudioCaptureClient, __uuidof(IAudioCaptureClient));
-#endif
+#include "SystemAudioCapture.h"
 
 namespace nos::audio
 {
-
-#ifdef _WIN32
-class WASAPICapture
-{
-public:
-	WASAPICapture() : IsCapturing(false), ShouldStop(false)
-	{
-		CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-	}
-
-	~WASAPICapture()
-	{
-		Stop();
-		CoUninitialize();
-	}
-
-	bool Initialize(uint32_t sampleRate, uint8_t channelCount)
-	{
-		HRESULT hr;
-
-		// Create device enumerator
-		IMMDeviceEnumeratorPtr enumerator;
-		hr = enumerator.CreateInstance(__uuidof(MMDeviceEnumerator));
-		if (FAILED(hr))
-			return false;
-
-		// Get default audio endpoint (for loopback capture)
-		IMMDevicePtr device;
-		hr = enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &device);
-		if (FAILED(hr))
-			return false;
-
-		// Get device name
-		IPropertyStore* props = nullptr;
-		hr = device->OpenPropertyStore(STGM_READ, &props);
-		if (SUCCEEDED(hr))
-		{
-			PROPVARIANT varName;
-			PropVariantInit(&varName);
-			hr = props->GetValue(PKEY_Device_FriendlyName, &varName);
-			if (SUCCEEDED(hr))
-			{
-				DeviceName = _com_util::ConvertBSTRToString(varName.bstrVal);
-				PropVariantClear(&varName);
-			}
-			props->Release();
-		}
-
-		// Activate audio client
-		hr = device->Activate(__uuidof(IAudioClient), CLSCTX_ALL, nullptr, (void**)&AudioClient);
-		if (FAILED(hr))
-			return false;
-
-		// Get the mix format
-		WAVEFORMATEX* mixFormat = nullptr;
-		hr = AudioClient->GetMixFormat(&mixFormat);
-		if (FAILED(hr))
-			return false;
-
-		// Initialize audio client for loopback capture
-		hr = AudioClient->Initialize(
-			AUDCLNT_SHAREMODE_SHARED,
-			AUDCLNT_STREAMFLAGS_LOOPBACK,
-			10000000, // 1 second buffer
-			0,
-			mixFormat,
-			nullptr);
-
-		if (FAILED(hr))
-		{
-			CoTaskMemFree(mixFormat);
-			return false;
-		}
-
-		// Store format info
-		SourceSampleRate = mixFormat->nSamplesPerSec;
-		SourceChannelCount = mixFormat->nChannels;
-		TargetSampleRate = sampleRate;
-		TargetChannelCount = channelCount;
-
-		CoTaskMemFree(mixFormat);
-
-		// Get capture client
-		hr = AudioClient->GetService(__uuidof(IAudioCaptureClient), (void**)&CaptureClient);
-		if (FAILED(hr))
-			return false;
-
-		return true;
-	}
-
-	bool Start()
-	{
-		if (IsCapturing)
-			return true;
-
-		if (!AudioClient)
-			return false;
-
-		HRESULT hr = AudioClient->Start();
-		if (FAILED(hr))
-			return false;
-
-		IsCapturing = true;
-		ShouldStop = false;
-		CaptureThread = std::thread(&WASAPICapture::CaptureThreadFunc, this);
-
-		return true;
-	}
-
-	void Stop()
-	{
-		if (!IsCapturing)
-			return;
-
-		ShouldStop = true;
-		if (CaptureThread.joinable())
-			CaptureThread.join();
-
-		if (AudioClient)
-			AudioClient->Stop();
-
-		IsCapturing = false;
-	}
-
-	bool ReadSamples(int32_t* outBuffer, uint32_t numSamples, uint8_t targetChannels, float gain)
-	{
-		std::unique_lock lock(BufferMutex);
-
-		// Calculate how many source samples we need
-		float sampleRateRatio = static_cast<float>(SourceSampleRate) / static_cast<float>(TargetSampleRate);
-		uint32_t sourceSamplesNeeded = static_cast<uint32_t>(numSamples * sampleRateRatio);
-
-		// If we don't have enough samples, fill with silence
-		if (CapturedSamples.size() < sourceSamplesNeeded * SourceChannelCount)
-		{
-			for (uint32_t i = 0; i < numSamples * targetChannels; ++i)
-				outBuffer[i] = 0;
-			return false; // No audio available
-		}
-
-		// Resample and convert
-		for (uint32_t i = 0; i < numSamples; ++i)
-		{
-			float sourceIndex = i * sampleRateRatio;
-			uint32_t sourceIndexInt = static_cast<uint32_t>(sourceIndex);
-			float frac = sourceIndex - sourceIndexInt;
-
-			for (uint8_t ch = 0; ch < targetChannels; ++ch)
-			{
-				// Map target channel to source channel (handle mono/stereo conversions)
-				uint8_t sourceChannel = (ch < SourceChannelCount) ? ch : 0;
-
-				// Get samples for interpolation
-				uint32_t idx1 = sourceIndexInt * SourceChannelCount + sourceChannel;
-				uint32_t idx2 = std::min(idx1 + SourceChannelCount, static_cast<uint32_t>(CapturedSamples.size() - 1));
-
-				if (idx1 < CapturedSamples.size() && idx2 < CapturedSamples.size())
-				{
-					float sample1 = CapturedSamples[idx1];
-					float sample2 = CapturedSamples[idx2];
-					float interpolated = sample1 + (sample2 - sample1) * frac;
-					
-					// Apply gain and convert to shifted int24
-					interpolated *= gain;
-					outBuffer[i * targetChannels + ch] = FloatToShiftedInt24(interpolated);
-				}
-				else
-				{
-					outBuffer[i * targetChannels + ch] = 0;
-				}
-			}
-		}
-
-		// Remove consumed samples
-		uint32_t samplesToRemove = sourceSamplesNeeded * SourceChannelCount;
-		if (samplesToRemove < CapturedSamples.size())
-			CapturedSamples.erase(CapturedSamples.begin(), CapturedSamples.begin() + samplesToRemove);
-
-		return true; // Audio successfully read
-	}
-
-	const std::string& GetDeviceName() const { return DeviceName; }
-
-private:
-	void CaptureThreadFunc()
-	{
-		while (!ShouldStop)
-		{
-			if (!CaptureClient)
-				break;
-
-			UINT32 packetLength = 0;
-			HRESULT hr = CaptureClient->GetNextPacketSize(&packetLength);
-			if (FAILED(hr))
-				break;
-
-			while (packetLength > 0)
-			{
-				BYTE* data = nullptr;
-				UINT32 numFramesAvailable = 0;
-				DWORD flags = 0;
-
-				hr = CaptureClient->GetBuffer(&data, &numFramesAvailable, &flags, nullptr, nullptr);
-				if (FAILED(hr))
-					break;
-
-				// Convert samples to float and store
-				if (!(flags & AUDCLNT_BUFFERFLAGS_SILENT))
-				{
-					float* floatData = reinterpret_cast<float*>(data);
-					std::lock_guard<std::mutex> lock(BufferMutex);
-					
-					for (UINT32 i = 0; i < numFramesAvailable * SourceChannelCount; ++i)
-					{
-						CapturedSamples.push_back(floatData[i]);
-					}
-
-					// Limit buffer size to prevent unbounded growth (keep max 5 seconds)
-					size_t maxSamples = SourceSampleRate * SourceChannelCount * 5;
-					if (CapturedSamples.size() > maxSamples)
-					{
-						CapturedSamples.erase(CapturedSamples.begin(), 
-											   CapturedSamples.begin() + (CapturedSamples.size() - maxSamples));
-					}
-				}
-
-				CaptureClient->ReleaseBuffer(numFramesAvailable);
-
-				hr = CaptureClient->GetNextPacketSize(&packetLength);
-				if (FAILED(hr))
-					break;
-			}
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		}
-	}
-
-	IAudioClientPtr AudioClient;
-	IAudioCaptureClientPtr CaptureClient;
-	std::thread CaptureThread;
-	std::atomic<bool> IsCapturing;
-	std::atomic<bool> ShouldStop;
-	std::vector<float> CapturedSamples;
-	std::mutex BufferMutex;
-	uint32_t SourceSampleRate = 0;
-	uint8_t SourceChannelCount = 0;
-	uint32_t TargetSampleRate = 0;
-	uint8_t TargetChannelCount = 0;
-	std::string DeviceName;
-};
-#endif
 
 struct SystemAudioInputNode : NodeContext
 {
@@ -294,61 +30,60 @@ struct SystemAudioInputNode : NodeContext
 	nosResult OnCreate(nosFbNodePtr) override
 	{
 		AddPinValueWatcher<bool>(NOS_NAME("Active"),
-								 [this](const bool* newVal, std::optional<const bool*> oldVal) {
+								 [this](const bool* newVal, std::optional<const bool*> /*oldVal*/) {
 									 Active = *newVal;
-									 if (Active)
-										 SetNodeStatusMessageIfChanged("System audio input active", fb::NodeStatusMessageType::INFO);
-									 else
-										 SetNodeStatusMessageIfChanged("System audio input inactive", fb::NodeStatusMessageType::WARNING);
+									 // Status is owned by ExecuteNode so it stays consistent with the
+									 // capture backend state. Writing here too races with the frame
+									 // loop and flaps the node status between "active" and the
+									 // capture-backend messages on every pin-value update (including
+									 // the one that fires during graph load).
 								 });
 
 		AddPinValueWatcher<uint32_t>(NOS_NAME("SampleRate"),
-								 [this](const uint32_t* newVal, std::optional<const uint32_t*> oldVal) {
-									 if (!oldVal || *newVal != **oldVal)
-										 NeedsReinitialize = true;
-								 });
+									 [this](const uint32_t* newVal, std::optional<const uint32_t*> oldVal) {
+										 if (!oldVal || *newVal != **oldVal)
+											 NeedsReinitialize = true;
+									 });
 
 		AddPinValueWatcher<uint8_t>(NOS_NAME("ChannelCount"),
-								 [this](const uint8_t* newVal, std::optional<const uint8_t*> oldVal) {
-									 if (!oldVal || *newVal != **oldVal)
-										 NeedsReinitialize = true;
-								 });
+									[this](const uint8_t* newVal, std::optional<const uint8_t*> oldVal) {
+										if (!oldVal || *newVal != **oldVal)
+											NeedsReinitialize = true;
+									});
 
 		return NOS_RESULT_SUCCESS;
 	}
 
 	~SystemAudioInputNode() override
 	{
-#ifdef _WIN32
 		if (Capture)
-		{
 			Capture->Stop();
-			Capture.reset();
-		}
-#endif
 	}
 
 	void OnPathStart() override
 	{
-		ClearNodeStatusMessages();
 		AccumulatedSampleNumerator = 0;
 		CurrentSampleIndex = 0;
-		NeedsReinitialize = true;
-		
-		if (Active)
-			SetNodeStatusMessageIfChanged("System audio input active", fb::NodeStatusMessageType::INFO);
-		else
-			SetNodeStatusMessageIfChanged("System audio input inactive", fb::NodeStatusMessageType::WARNING);
+
+		// Don't force a re-init here. If the engine restarts paths frequently
+		// (e.g. downstream scheduler changes, other nodes calling SendPathRestart),
+		// destroying and recreating Capture every round makes the node post the
+		// same "Audio capture is ready …" status message over and over. The
+		// SampleRate / ChannelCount pin watchers already set NeedsReinitialize
+		// when the capture format actually changes; anything else just needs a
+		// cheap Start() to resume a backend we paused in OnPathStop.
+		if (Active && Capture)
+			Capture->Start();
+
+		// Don't clear LastStatusMessage either — keeping it means the guard in
+		// SetNodeStatusMessageIfChanged suppresses a same-string repost from
+		// the first post-restart frame, which is the source of the flap.
 	}
 
 	void OnPathStop() override
 	{
-#ifdef _WIN32
 		if (Capture)
-		{
 			Capture->Stop();
-		}
-#endif
 		ClearNodeStatusMessages();
 	}
 
@@ -358,22 +93,21 @@ struct SystemAudioInputNode : NodeContext
 		auto& channelCount = *pins.GetPinValue<uint8_t>(NOS_NAME("ChannelCount"));
 		auto& gain = *pins.GetPinValue<float>(NOS_NAME("Gain"));
 
-		// Only support fixed step timing
 		if (pins.TimingMode != NOS_EXECUTION_TIMING_MODE_FIXED_STEP)
 		{
 			SetNodeStatusMessageIfChanged("Unsupported timing mode", fb::NodeStatusMessageType::FAILURE);
 			return NOS_RESULT_FAILED;
 		}
 
-		// Check for invalid timing values
 		if (pins.FixedStepTiming.DeltaSeconds.y == 0)
 		{
 			SetNodeStatusMessageIfChanged("Invalid timing values", fb::NodeStatusMessageType::FAILURE);
 			return NOS_RESULT_FAILED;
 		}
 
-#ifdef _WIN32
-		// Initialize or reinitialize capture if needed
+		// (Re)create the backend whenever Active flips on or the requested
+		// format changes. A null Capture after this branch means the platform
+		// has no backend compiled in — we emit silence + a status message.
 		if (Active && (NeedsReinitialize || !Capture))
 		{
 			if (Capture)
@@ -382,10 +116,22 @@ struct SystemAudioInputNode : NodeContext
 				Capture.reset();
 			}
 
-			Capture = std::make_unique<WASAPICapture>();
+			Capture = ISystemAudioCapture::Create();
+			if (!Capture)
+			{
+				SetNodeStatusMessageIfChanged("System audio input is not supported on this platform",
+											  fb::NodeStatusMessageType::FAILURE);
+				Active = false;
+				return NOS_RESULT_FAILED;
+			}
+
 			if (!Capture->Initialize(sampleRate, channelCount))
 			{
-				SetNodeStatusMessageIfChanged("Failed to initialize system audio capture", fb::NodeStatusMessageType::FAILURE);
+				const auto& err = Capture->GetLastError();
+				SetNodeStatusMessageIfChanged(
+					err.empty() ? std::string("Failed to initialize system audio capture")
+								: "Failed to initialize system audio capture: " + err,
+					fb::NodeStatusMessageType::FAILURE);
 				Capture.reset();
 				Active = false;
 				return NOS_RESULT_FAILED;
@@ -393,7 +139,11 @@ struct SystemAudioInputNode : NodeContext
 
 			if (!Capture->Start())
 			{
-				SetNodeStatusMessageIfChanged("Failed to start system audio capture", fb::NodeStatusMessageType::FAILURE);
+				const auto& err = Capture->GetLastError();
+				SetNodeStatusMessageIfChanged(
+					err.empty() ? std::string("Failed to start system audio capture")
+								: "Failed to start system audio capture: " + err,
+					fb::NodeStatusMessageType::FAILURE);
 				Capture.reset();
 				Active = false;
 				return NOS_RESULT_FAILED;
@@ -411,22 +161,17 @@ struct SystemAudioInputNode : NodeContext
 			Capture.reset();
 			SetNodeStatusMessageIfChanged("System audio input inactive", fb::NodeStatusMessageType::WARNING);
 		}
-#else
-		// System audio input is not supported on non-Windows platforms yet
-		SetNodeStatusMessageIfChanged("System audio input is not supported on this platform yet", fb::NodeStatusMessageType::FAILURE);
-		return NOS_RESULT_FAILED;
-#endif
 
-		uint64_t deltaNumerator = pins.FixedStepTiming.DeltaSeconds.x;
-		uint64_t deltaDenominator = pins.FixedStepTiming.DeltaSeconds.y;
+		const uint64_t deltaNumerator = pins.FixedStepTiming.DeltaSeconds.x;
+		const uint64_t deltaDenominator = pins.FixedStepTiming.DeltaSeconds.y;
 
 		AccumulatedSampleNumerator += deltaNumerator * static_cast<uint64_t>(sampleRate);
+		const uint32_t numSamples = static_cast<uint32_t>(AccumulatedSampleNumerator / deltaDenominator);
+		AccumulatedSampleNumerator %= deltaDenominator;
 
-		uint32_t numSamples = static_cast<uint32_t>(AccumulatedSampleNumerator / deltaDenominator);
-		AccumulatedSampleNumerator %= deltaDenominator; // Keep remainder for next frame
-
-		// Create or resize audio buffer only if needed (with 1.1x headroom to avoid frequent reallocations)
-		size_t requiredBufferSize = numSamples * sizeof(uint32_t) * channelCount;
+		// Create or grow the audio buffer only when strictly necessary; 1.1x
+		// headroom amortises reallocations across small timing fluctuations.
+		const size_t requiredBufferSize = static_cast<size_t>(numSamples) * sizeof(uint32_t) * channelCount;
 		size_t allocatedBufferSize = 0;
 		if (AudioPacketBuffer)
 		{
@@ -439,9 +184,7 @@ struct SystemAudioInputNode : NodeContext
 		if (!AudioPacketBuffer || requiredBufferSize > allocatedBufferSize)
 		{
 			AudioPacketBuffer = {};
-
-			// Allocate 1.1x the required size to reduce frequency of reallocations
-			size_t newBufferSize = requiredBufferSize * 1.1f;
+			const size_t newBufferSize = static_cast<size_t>(requiredBufferSize * 1.1f);
 
 			nosBufferInfo audioBufferDesc = {};
 			audioBufferDesc.Size = static_cast<uint32_t>(newBufferSize);
@@ -459,57 +202,38 @@ struct SystemAudioInputNode : NodeContext
 			}
 		}
 
-		int32_t* audioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(AudioPacketBuffer));
+		auto* audioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(AudioPacketBuffer));
 		if (!audioSamples)
 		{
 			SetNodeStatusMessageIfChanged("Failed to map audio buffer", fb::NodeStatusMessageType::FAILURE);
 			return NOS_RESULT_FAILED;
 		}
 
-		if (Active)
+		if (Active && Capture)
 		{
-#ifdef _WIN32
-			// Read captured system audio
-			if (Capture)
-			{
-				bool hasAudio = Capture->ReadSamples(audioSamples, numSamples, channelCount, gain);
-				std::string deviceName = Capture->GetDeviceName();
-				std::string deviceSuffix = deviceName.empty() ? "" : " - " + deviceName;
-				
-				if (hasAudio)
-					SetNodeStatusMessageIfChanged("Capturing audio" + deviceSuffix, fb::NodeStatusMessageType::INFO);
-				else
-					SetNodeStatusMessageIfChanged("Audio capture is ready" + deviceSuffix, fb::NodeStatusMessageType::INFO);
-			}
-			else
-#endif
-			{
-				// Fill with silence if capture failed
-				for (uint32_t i = 0; i < numSamples * channelCount; ++i)
-				{
-					audioSamples[i] = 0;
-				}
-			}
+			// Don't update the status message every frame based on whether
+			// this single frame delivered audio — ReadSamples flips true/false
+			// at the rate of buffer fills, which causes the editor's node
+			// status area to spam updates. The "ready" message posted after
+			// Initialize/Start stays put; transitions (inactive, failure) are
+			// the only things that republish.
+			Capture->ReadSamples(audioSamples, numSamples, channelCount, gain);
 		}
 		else
 		{
-			// Fill with silence when inactive
 			for (uint32_t i = 0; i < numSamples * channelCount; ++i)
-			{
 				audioSamples[i] = 0;
-			}
 		}
 
-		// Update current sample index
 		CurrentSampleIndex += numSamples;
 
 		AudioPacketDescriptor audioPacketDesc(
 			sampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, sizeof(int32_t), channelCount);
 
 		ObjectRef outDesc{};
-		nosEngine.ObjectAPI->CreatePrimitiveObject(NOS_NAME(AudioPacketDescriptor::GetFullyQualifiedName()), 
-												  nos::Buffer::From(audioPacketDesc), 
-												  &outDesc.GetStorage());
+		nosEngine.ObjectAPI->CreatePrimitiveObject(NOS_NAME(AudioPacketDescriptor::GetFullyQualifiedName()),
+												   nos::Buffer::From(audioPacketDesc),
+												   &outDesc.GetStorage());
 
 		ObjectRef out{};
 		std::vector<nosCompositeObjectField> fields;
@@ -521,14 +245,12 @@ struct SystemAudioInputNode : NodeContext
 			.FieldName = NOS_NAME("buffer"),
 			.FieldObjectId = AudioPacketBuffer,
 		});
-		nosEngine.ObjectAPI->CreateCompositeObject(NOS_NAME(AudioPacket::GetFullyQualifiedName()), 
-												  fields.data(), 
-												  fields.size(), 
-												  &out.GetStorage());
+		nosEngine.ObjectAPI->CreateCompositeObject(NOS_NAME(AudioPacket::GetFullyQualifiedName()),
+												   fields.data(),
+												   fields.size(),
+												   &out.GetStorage());
 
 		NOS_SOFT_CHECK(out, "Failed to create output AudioPacket object");
-
-		// Set output pin values
 		SetPinObject(NOS_NAME("AudioPacket"), out);
 
 		return NOS_RESULT_SUCCESS;
@@ -540,10 +262,7 @@ struct SystemAudioInputNode : NodeContext
 	bool Active = false;
 	bool NeedsReinitialize = false;
 	std::string LastStatusMessage;
-
-#ifdef _WIN32
-	std::unique_ptr<WASAPICapture> Capture;
-#endif
+	std::unique_ptr<ISystemAudioCapture> Capture;
 };
 
 nosResult RegisterSystemAudioInputNode(nosNodeFunctions* fn)
