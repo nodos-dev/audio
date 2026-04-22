@@ -11,8 +11,8 @@
 #include <Windows.h>
 #include <Audioclient.h>
 #include <comdef.h>
-#include <functiondiscoverykeys_devpkey.h>
 #include <mmdeviceapi.h>
+#include <functiondiscoverykeys_devpkey.h>
 
 _COM_SMARTPTR_TYPEDEF(IMMDeviceEnumerator, __uuidof(IMMDeviceEnumerator));
 _COM_SMARTPTR_TYPEDEF(IMMDevice, __uuidof(IMMDevice));
