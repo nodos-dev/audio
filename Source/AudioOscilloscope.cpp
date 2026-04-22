@@ -112,14 +112,23 @@ struct AudioOscilloscopeNode : NodeContext
 		{
 			uint32_t startSample = bin * samplesPerBin;
 			uint32_t endSample = std::min(startSample + samplesPerBin, numSamples);
+			// Guard the averaging: if numSamples is smaller than
+			// scopeTexSize * samplesPerBin, trailing bins have
+			// startSample >= numSamples, the inner loop runs zero times,
+			// and `binValue / 0` produces NaN. That NaN then flows into
+			// FrameHistory and poisons the bin's moving average for the
+			// lifetime of this node context.
+			if (endSample <= startSample)
+			{
+				currentFrameData[bin] = 0.0f;
+				continue;
+			}
 			float binValue = 0.0f;
 			for (uint32_t i = startSample; i < endSample; ++i)
 			{
 				binValue += monoAudio[i];
 			}
-			binValue /= (endSample - startSample); // Average the samples in this bin
-			
-			currentFrameData[bin] = binValue;
+			currentFrameData[bin] = binValue / static_cast<float>(endSample - startSample);
 		}
 
 		// Store current frame data and calculate moving average

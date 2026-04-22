@@ -36,6 +36,11 @@ public:
 	// backend has not produced enough data yet.
 	virtual bool ReadSamples(int32_t* outBuffer, uint32_t numSamples, uint8_t targetChannels, float gain) = 0;
 
+	// Drop any audio that has accumulated in the internal ring buffer. Called
+	// on path start so the consumer doesn't have to pay for latency that built
+	// up between Start() and the first ReadSamples.
+	virtual void DiscardBufferedSamples() = 0;
+
 	virtual const std::string& GetDeviceName() const = 0;
 	virtual const std::string& GetLastError() const = 0;
 
@@ -51,6 +56,7 @@ class SystemAudioCaptureBase : public ISystemAudioCapture
 {
 public:
 	bool ReadSamples(int32_t* outBuffer, uint32_t numSamples, uint8_t targetChannels, float gain) override;
+	void DiscardBufferedSamples() override { ResetBuffer(); }
 	const std::string& GetDeviceName() const override { return DeviceName; }
 	const std::string& GetLastError() const override { return LastError; }
 

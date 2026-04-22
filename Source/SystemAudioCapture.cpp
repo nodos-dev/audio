@@ -13,7 +13,7 @@ namespace
 // Keep at most this many seconds of buffered source samples to stop a stalled
 // consumer (or a hung execution graph) from growing memory unbounded. The
 // existing WASAPI backend used 5 seconds; we keep the same budget for parity.
-constexpr uint32_t kMaxBufferedSeconds = 5;
+constexpr uint32_t MAX_BUFFERED_SECONDS = 5;
 } // namespace
 
 void SystemAudioCaptureBase::ResetBuffer()
@@ -44,7 +44,7 @@ void SystemAudioCaptureBase::PushInterleavedSamples(const float* samples,
 	const size_t sampleCount = static_cast<size_t>(frameCount) * sourceChannelCount;
 	CapturedSamples.insert(CapturedSamples.end(), samples, samples + sampleCount);
 
-	const size_t maxSamples = static_cast<size_t>(SourceSampleRate) * SourceChannelCount * kMaxBufferedSeconds;
+	const size_t maxSamples = static_cast<size_t>(SourceSampleRate) * SourceChannelCount * MAX_BUFFERED_SECONDS;
 	if (CapturedSamples.size() > maxSamples)
 	{
 		const size_t overflow = CapturedSamples.size() - maxSamples;
@@ -110,6 +110,22 @@ bool SystemAudioCaptureBase::ReadSamples(int32_t* outBuffer, uint32_t numSamples
 		CapturedSamples.erase(CapturedSamples.begin(), CapturedSamples.begin() + samplesToRemove);
 	else
 		CapturedSamples.clear();
+
+	// Post-read drift correction: ReadSamples consumes at exactly real-time
+	// rate, so any historical producer/consumer skew (startup gap, frame-drop
+	// stall, path-restart burst) would otherwise persist as permanent latency
+	// — we just pull from the head forever, staying N ms behind live. Cap the
+	// residual buffer at a small smoothing window; anything older gets dropped
+	// so the next read snaps back toward live. The discontinuity this causes
+	// is audibly a one-shot click, preferable to sustained lag.
+	constexpr float MAX_POST_READ_SECONDS = 0.1f;
+	const size_t maxKeep = static_cast<size_t>(static_cast<float>(SourceSampleRate) * MAX_POST_READ_SECONDS) *
+						   SourceChannelCount;
+	if (maxKeep > 0 && CapturedSamples.size() > maxKeep)
+	{
+		const size_t drop = CapturedSamples.size() - maxKeep;
+		CapturedSamples.erase(CapturedSamples.begin(), CapturedSamples.begin() + drop);
+	}
 
 	return true;
 }

@@ -74,7 +74,7 @@ private:
 	// before giving up. Initialize / Start / Stop are called from the editor
 	// execution thread, so we cap the wait to keep a hung system-service
 	// from stalling the whole graph.
-	static constexpr uint64_t kAsyncTimeoutSeconds = 5;
+	static constexpr uint64_t ASYNC_TIMEOUT_SECONDS = 5;
 
 	SCStream* Stream API_AVAILABLE(macos(13.0)) = nil;
 	NosAudioStreamOutput* Delegate API_AVAILABLE(macos(13.0)) = nil;
@@ -276,7 +276,7 @@ bool ScreenCaptureKitCapture::Start()
 					}
 					done = true;
 				}];
-				if (!PumpMainRunLoopUntil(done, kAsyncTimeoutSeconds))
+				if (!PumpMainRunLoopUntil(done, ASYNC_TIMEOUT_SECONDS))
 				{
 					LastError = "Timed out starting ScreenCaptureKit stream";
 					return;
@@ -311,7 +311,7 @@ void ScreenCaptureKitCapture::Stop()
 					[Stream stopCaptureWithCompletionHandler:^(NSError* /*error*/) {
 						done = true;
 					}];
-					PumpMainRunLoopUntil(done, kAsyncTimeoutSeconds);
+					PumpMainRunLoopUntil(done, ASYNC_TIMEOUT_SECONDS);
 				}
 				if (Delegate)
 					Delegate.backend = nullptr;
