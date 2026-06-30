@@ -4,9 +4,11 @@
 
 #include <nosSysVulkan/Helpers.hpp>
 
+#include <algorithm>
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "nosAudio/Audio_generated.h"
 #include "nosAudio/AudioConversions.hpp"
@@ -15,6 +17,12 @@
 
 namespace nos::audio
 {
+// The node captures at the device's native format and passes it straight
+// through, so there are no rate/channel input pins and it requests no specific
+// format from the backend. These defaults only label the empty packet emitted
+// before the first captured frame reveals the real device format.
+constexpr uint32_t DEFAULT_SAMPLE_RATE = 48000;
+constexpr uint8_t DEFAULT_CHANNEL_COUNT = 2;
 
 struct SystemAudioInputNode : NodeContext
 {
@@ -27,21 +35,22 @@ struct SystemAudioInputNode : NodeContext
 		}
 	}
 
-	nosResult OnCreate(nosFbNodePtr) override
+	// Post several status lines at once (the editor renders each as its own
+	// row). The change guard keys off the newline-joined text so a steady
+	// stream of identical multi-line statuses doesn't spam updates.
+	void SetNodeStatusMessagesIfChanged(const std::vector<fb::TNodeStatusMessage>& messages)
 	{
-		AddPinValueWatcher<uint32_t>(NOS_NAME("SampleRate"),
-									 [this](const uint32_t* newVal, std::optional<const uint32_t*> oldVal) {
-										 if (!oldVal || *newVal != **oldVal)
-											 NeedsReinitialize = true;
-									 });
-
-		AddPinValueWatcher<uint8_t>(NOS_NAME("ChannelCount"),
-									[this](const uint8_t* newVal, std::optional<const uint8_t*> oldVal) {
-										if (!oldVal || *newVal != **oldVal)
-											NeedsReinitialize = true;
-									});
-
-		return NOS_RESULT_SUCCESS;
+		std::string key;
+		for (const auto& m : messages)
+		{
+			key += m.text;
+			key += '\n';
+		}
+		if (LastStatusMessage != key)
+		{
+			SetNodeStatusMessages(messages);
+			LastStatusMessage = key;
+		}
 	}
 
 	~SystemAudioInputNode() override
@@ -52,12 +61,9 @@ struct SystemAudioInputNode : NodeContext
 
 	void OnPathStart() override
 	{
-		AccumulatedSampleNumerator = 0;
-		CurrentSampleIndex = 0;
-		// Drop any audio that queued up between Capture->Start() and this
-		// first consumer tick. Without this, the consumer would forever play
-		// from the back of a full ring buffer, running the apparent latency
-		// ceiling (~100ms after the in-read trim) instead of the floor.
+		// Drop whatever queued up between Capture->Start() and this first tick
+		// so the first packet after a restart carries one tick's worth of audio
+		// rather than the whole accumulated backlog as a single burst.
 		if (Capture)
 			Capture->DiscardBufferedSamples();
 	}
@@ -79,33 +85,15 @@ struct SystemAudioInputNode : NodeContext
 		// the watcher has propagated the saved `true`, which left the node
 		// inert until the user toggled the pin.
 		const bool active = *pins.GetPinValue<bool>(NOS_NAME("Active"));
-		auto& sampleRate = *pins.GetPinValue<uint32_t>(NOS_NAME("SampleRate"));
-		auto& channelCount = *pins.GetPinValue<uint8_t>(NOS_NAME("ChannelCount"));
-		auto& gain = *pins.GetPinValue<float>(NOS_NAME("Gain"));
+		const float gain = *pins.GetPinValue<float>(NOS_NAME("Gain"));
+		// No fixed-step timing is needed: this node ships exactly what the device
+		// produced this tick, at the device's own format, so it is agnostic to
+		// the graph's timing mode.
 
-		if (pins.TimingMode != NOS_EXECUTION_TIMING_MODE_FIXED_STEP)
+		// Create the backend when Active flips on. A null Capture after this
+		// branch means the platform has no backend compiled in.
+		if (active && !Capture)
 		{
-			SetNodeStatusMessageIfChanged("Unsupported timing mode", fb::NodeStatusMessageType::FAILURE);
-			return NOS_RESULT_FAILED;
-		}
-
-		if (pins.FixedStepTiming.DeltaSeconds.y == 0)
-		{
-			SetNodeStatusMessageIfChanged("Invalid timing values", fb::NodeStatusMessageType::FAILURE);
-			return NOS_RESULT_FAILED;
-		}
-
-		// (Re)create the backend whenever Active flips on or the requested
-		// format changes. A null Capture after this branch means the platform
-		// has no backend compiled in — we emit silence + a status message.
-		if (active && (NeedsReinitialize || !Capture))
-		{
-			if (Capture)
-			{
-				Capture->Stop();
-				Capture.reset();
-			}
-
 			Capture = ISystemAudioCapture::Create();
 			if (!Capture)
 			{
@@ -115,7 +103,7 @@ struct SystemAudioInputNode : NodeContext
 				return NOS_RESULT_FAILED;
 			}
 
-			if (!Capture->Initialize(sampleRate, channelCount))
+			if (!Capture->Initialize())
 			{
 				const auto& err = Capture->GetLastError();
 				SetNodeStatusMessageIfChanged(
@@ -138,40 +126,57 @@ struct SystemAudioInputNode : NodeContext
 				SetPinValue(NOS_NAME("Active"), false);
 				return NOS_RESULT_FAILED;
 			}
-
-			NeedsReinitialize = false;
 		}
 		else if (!active && Capture)
 		{
 			Capture->Stop();
 			Capture.reset();
+		}
+
+		// Pull everything captured since the last tick. deviceRate / deviceChannels
+		// report the format the OS actually delivered (0 until the first frame
+		// arrives). DrainScratch is reused across ticks so the steady state does
+		// not allocate.
+		uint32_t deviceRate = 0;
+		uint8_t deviceChannels = 0;
+		if (active && Capture)
+			Capture->DrainSamples(DrainScratch, deviceRate, deviceChannels);
+		else
+			DrainScratch.clear();
+
+		// Status. Re-posted every tick while live (and on inactivity) so it
+		// survives path restarts that clear the node status; the change guard
+		// suppresses spam when the strings haven't moved.
+		if (active && Capture)
+		{
+			std::vector<fb::TNodeStatusMessage> messages;
+			messages.push_back({{}, "Capturing system audio", fb::NodeStatusMessageType::INFO});
+			if (!Capture->GetDeviceName().empty())
+				messages.push_back({{}, Capture->GetDeviceName(), fb::NodeStatusMessageType::INFO});
+			if (deviceRate != 0)
+				messages.push_back({{},
+									std::to_string(deviceRate) + " Hz, " + std::to_string(deviceChannels) + " ch",
+									fb::NodeStatusMessageType::INFO});
+			SetNodeStatusMessagesIfChanged(messages);
+		}
+		else
+		{
 			SetNodeStatusMessageIfChanged("System audio input inactive", fb::NodeStatusMessageType::WARNING);
 		}
 
-		// Steady-state status, re-posted every frame while capture is live.
-		// Posting here (instead of once inside the init branch) means the
-		// message survives path restarts: if OnPathStop or an external clear
-		// wipes the node status, the very next ExecuteNode repaints it, and
-		// the SetNodeStatusMessageIfChanged guard suppresses spam in the
-		// common case where the string hasn't changed.
-		if (active && Capture)
-		{
-			std::string deviceMsg = "Capturing system audio";
-			if (!Capture->GetDeviceName().empty())
-				deviceMsg += " (" + Capture->GetDeviceName() + ")";
-			SetNodeStatusMessageIfChanged(deviceMsg, fb::NodeStatusMessageType::INFO);
-		}
-
-		const uint64_t deltaNumerator = pins.FixedStepTiming.DeltaSeconds.x;
-		const uint64_t deltaDenominator = pins.FixedStepTiming.DeltaSeconds.y;
-
-		AccumulatedSampleNumerator += deltaNumerator * static_cast<uint64_t>(sampleRate);
-		const uint32_t numSamples = static_cast<uint32_t>(AccumulatedSampleNumerator / deltaDenominator);
-		AccumulatedSampleNumerator %= deltaDenominator;
+		// Output format mirrors the device. Before the first frame arrives the
+		// format is unknown; fall back to the defaults so the (empty) packet is
+		// still well-formed.
+		const uint32_t outRate = deviceRate != 0 ? deviceRate : DEFAULT_SAMPLE_RATE;
+		const uint8_t outChannels = deviceChannels != 0 ? deviceChannels : DEFAULT_CHANNEL_COUNT;
+		const uint32_t numSamples = outChannels != 0 ? static_cast<uint32_t>(DrainScratch.size() / outChannels) : 0;
 
 		// Create or grow the audio buffer only when strictly necessary; 1.1x
-		// headroom amortises reallocations across small timing fluctuations.
-		const size_t requiredBufferSize = static_cast<size_t>(numSamples) * sizeof(uint32_t) * channelCount;
+		// headroom amortises reallocations across packet-size fluctuations. Keep
+		// room for at least one frame so a zero-sample tick still has a valid
+		// buffer object to attach to the packet.
+		const size_t requiredBufferSize =
+			std::max<size_t>(static_cast<size_t>(numSamples), 1) * sizeof(uint32_t) * outChannels;
 		size_t allocatedBufferSize = 0;
 		if (AudioPacketBuffer)
 		{
@@ -222,26 +227,14 @@ struct SystemAudioInputNode : NodeContext
 			return NOS_RESULT_FAILED;
 		}
 
-		if (active && Capture)
-		{
-			// Don't update the status message every frame based on whether
-			// this single frame delivered audio — ReadSamples flips true/false
-			// at the rate of buffer fills, which causes the editor's node
-			// status area to spam updates. The "ready" message posted after
-			// Initialize/Start stays put; transitions (inactive, failure) are
-			// the only things that republish.
-			Capture->ReadSamples(audioSamples, numSamples, channelCount, gain);
-		}
-		else
-		{
-			for (uint32_t i = 0; i < numSamples * channelCount; ++i)
-				audioSamples[i] = 0;
-		}
-
-		CurrentSampleIndex += numSamples;
+		// Apply gain and pack the device's Float32 samples into shifted int24,
+		// straight through at the device's own rate and channel layout.
+		const uint32_t totalSamples = numSamples * outChannels;
+		for (uint32_t i = 0; i < totalSamples; ++i)
+			audioSamples[i] = FloatToShiftedInt24(DrainScratch[i] * gain);
 
 		AudioPacketDescriptor audioPacketDesc(
-			sampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, sizeof(int32_t), channelCount);
+			outRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, sizeof(int32_t), outChannels);
 
 		ObjectRef outDesc{};
 		nosEngine.ObjectAPI->CreatePrimitiveObject(NOS_NAME(AudioPacketDescriptor::GetFullyQualifiedName()),
@@ -270,9 +263,7 @@ struct SystemAudioInputNode : NodeContext
 	}
 
 	TypedObjectRef<sys::vulkan::Buffer> AudioPacketBuffer;
-	uint64_t AccumulatedSampleNumerator = 0;
-	uint64_t CurrentSampleIndex = 0;
-	bool NeedsReinitialize = false;
+	std::vector<float> DrainScratch;
 	std::string LastStatusMessage;
 	std::unique_ptr<ISystemAudioCapture> Capture;
 };

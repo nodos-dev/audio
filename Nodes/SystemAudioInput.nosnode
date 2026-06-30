@@ -9,7 +9,7 @@
 			"node": {
 				"class_name": "SystemAudioInput",
 				"contents_type": "Job",
-				"description": "Captures system audio output using loopback recording",
+				"description": "Captures the system audio output (loopback) and passes it through at the\ndevice's native sample rate and channel count. Each frame emits exactly the\nsamples captured since the last tick, so the packet's sample count varies; the\nAudioPacket carries the detected format. Feed a Resample node downstream to\nconvert to a fixed rate.",
 				"always_execute": true,
 				"pins": [
 					{
@@ -22,27 +22,9 @@
 						"data": true
 					},
 					{
-						"name": "SampleRate",
-						"display_name": "Sample Rate",
-						"description": "Target sample rate for captured audio",
-						"type_name": "uint",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 48000
-					},
-					{
-						"name": "ChannelCount",
-						"display_name": "Channel Count",
-						"description": "Number of audio channels",
-						"type_name": "ubyte",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 2
-					},
-					{
 						"name": "Gain",
 						"display_name": "Gain",
-						"description": "Audio gain/volume multiplier",
+						"description": "Linear gain applied to every captured sample before output",
 						"type_name": "float",
 						"show_as": "PROPERTY",
 						"can_show_as": "INPUT_PIN_OR_PROPERTY",
@@ -53,7 +35,7 @@
 					{
 						"name": "AudioPacket",
 						"display_name": "Audio Packet",
-						"description": "Output audio packet containing captured system audio",
+						"description": "Captured system audio at the device's native rate and channel count.\nSample count varies per frame; the descriptor reports the detected format.",
 						"type_name": "nos.audio.AudioPacket",
 						"show_as": "OUTPUT_PIN",
 						"can_show_as": "OUTPUT_PIN_ONLY"

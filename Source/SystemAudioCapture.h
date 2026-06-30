@@ -19,26 +19,31 @@ class ISystemAudioCapture
 public:
 	virtual ~ISystemAudioCapture() = default;
 
-	// Prepare the backend for the node's requested target format. On failure
-	// returns false and leaves a user-readable reason in GetLastError().
-	virtual bool Initialize(uint32_t sampleRate, uint8_t channelCount) = 0;
+	// Prepare the backend. The capture format is whatever the OS provides — the
+	// shared-mode mix format on Windows, a fixed default on macOS — and is
+	// reported back via DrainSamples. On failure returns false and leaves a
+	// reason in GetLastError().
+	virtual bool Initialize() = 0;
 
-	// Begin producing samples into the internal ring buffer. Idempotent.
+	// Begin producing samples into the internal buffer. Idempotent.
 	virtual bool Start() = 0;
 
 	// Stop the backend and drain its worker. Safe to call before Start() or
 	// more than once.
 	virtual void Stop() = 0;
 
-	// Pull numSamples interleaved shifted-int24 frames into outBuffer at the
-	// requested channel layout and gain. Returns true when real audio was
-	// delivered, false when the buffer was filled with silence because the
-	// backend has not produced enough data yet.
-	virtual bool ReadSamples(int32_t* outBuffer, uint32_t numSamples, uint8_t targetChannels, float gain) = 0;
+	// Hand over every interleaved Float32 frame captured since the last call:
+	// outSamples is swapped with the internal buffer (so it returns cleared),
+	// and the device's actual negotiated format is reported via outSampleRate /
+	// outChannelCount (both 0 until the backend has produced its first frame).
+	// The node ships exactly what the device produced, at the device's own
+	// rate — no resampling, no fixed sample count — and labels the AudioPacket
+	// with that format. Drift and jitter become honest variable packet sizes
+	// that a downstream Resample node reconciles against its own clock.
+	virtual void DrainSamples(std::vector<float>& outSamples, uint32_t& outSampleRate, uint8_t& outChannelCount) = 0;
 
-	// Drop any audio that has accumulated in the internal ring buffer. Called
-	// on path start so the consumer doesn't have to pay for latency that built
-	// up between Start() and the first ReadSamples.
+	// Drop any buffered samples. Called on path start so the first tick after a
+	// restart doesn't ship the backlog accumulated since Start().
 	virtual void DiscardBufferedSamples() = 0;
 
 	virtual const std::string& GetDeviceName() const = 0;
@@ -48,14 +53,14 @@ public:
 	static std::unique_ptr<ISystemAudioCapture> Create();
 };
 
-// Shared ring-buffer + resampler scaffolding. Platform backends only have to
-// push interleaved float frames via PushInterleavedSamples; the base handles
-// rate conversion, gain, and int24 packing so the WASAPI / ScreenCaptureKit
-// files can stay focused on their respective native API dances.
+// Shared capture-buffer scaffolding. Platform backends only have to push
+// interleaved Float32 frames via PushInterleavedSamples; the base accumulates
+// them and hands the whole batch over on DrainSamples, so the WASAPI /
+// ScreenCaptureKit files can stay focused on their respective native API dances.
 class SystemAudioCaptureBase : public ISystemAudioCapture
 {
 public:
-	bool ReadSamples(int32_t* outBuffer, uint32_t numSamples, uint8_t targetChannels, float gain) override;
+	void DrainSamples(std::vector<float>& outSamples, uint32_t& outSampleRate, uint8_t& outChannelCount) override;
 	void DiscardBufferedSamples() override { ResetBuffer(); }
 	const std::string& GetDeviceName() const override { return DeviceName; }
 	const std::string& GetLastError() const override { return LastError; }
@@ -64,7 +69,7 @@ protected:
 	// Feed interleaved Float32 samples from the platform capture callback.
 	// If sourceSampleRate or sourceChannelCount differ from the previous call
 	// the internal buffer is reset, so format renegotiation mid-stream can't
-	// produce torn audio.
+	// produce a batch that mixes two layouts.
 	void PushInterleavedSamples(const float* samples,
 								uint32_t frameCount,
 								uint32_t sourceSampleRate,
@@ -77,8 +82,6 @@ protected:
 	std::vector<float> CapturedSamples;
 	uint32_t SourceSampleRate = 0;
 	uint8_t SourceChannelCount = 0;
-	uint32_t TargetSampleRate = 0;
-	uint8_t TargetChannelCount = 0;
 	std::string DeviceName;
 	std::string LastError;
 };

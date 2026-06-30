@@ -3,6 +3,7 @@
 #include <Nodos/Plugin.hpp>
 
 #include <nosSysVulkan/Helpers.hpp>
+#include <algorithm>
 #include <cmath>
 
 #ifndef M_PI
@@ -71,8 +72,11 @@ struct ResampleNode : NodeContext
 		float inputDurationSeconds = static_cast<float>(inputPacketDesc.num_samples()) / static_cast<float>(inputPacketDesc.sample_rate());
 		uint32_t outputNumSamples = static_cast<uint32_t>(inputDurationSeconds * static_cast<float>(outputSampleRate));
 
-		// Create or resize output audio buffer only if needed
-		size_t requiredBufferSize = outputNumSamples * sizeof(uint32_t) * outputChannelCount;
+		// Create or resize output audio buffer only if needed. Keep room for at
+		// least one frame so a zero-sample input (e.g. an idle capture tick)
+		// still yields a valid buffer object rather than a failed allocation.
+		size_t requiredBufferSize =
+			std::max<uint32_t>(outputNumSamples, 1u) * sizeof(uint32_t) * std::max<uint32_t>(outputChannelCount, 1u);
 		size_t allocatedBufferSize = OutputAudio ? sys::vulkan::GetResourceInfo(OutputAudio)->Size : 0;
 		
 		if (!OutputAudio || requiredBufferSize > allocatedBufferSize)
@@ -93,62 +97,65 @@ struct ResampleNode : NodeContext
 				return NOS_RESULT_FAILED;
 		}
 		
-		int32_t* outputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(OutputAudio));
-		int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(*inputBufObj));
-		
-		if (!outputAudioSamples || !inputAudioSamples)
+		// Only touch the sample buffers when there's actually audio to convert.
+		// A zero-sample input falls straight through to an empty output packet.
+		if (outputNumSamples > 0)
 		{
-			return NOS_RESULT_SUCCESS;
+			int32_t* outputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(OutputAudio));
+			int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(*inputBufObj));
+
+			if (outputAudioSamples && inputAudioSamples)
+			{
+				// Sample rate conversion ratio
+				float sampleRateRatio = static_cast<float>(inputPacketDesc.sample_rate()) / static_cast<float>(outputSampleRate);
+
+				for (uint32_t outputSample = 0; outputSample < outputNumSamples; ++outputSample)
+				{
+					// Calculate the corresponding input sample position (with fractional part for interpolation)
+					float inputSamplePos = static_cast<float>(outputSample) * sampleRateRatio;
+					uint32_t inputSampleIndex = static_cast<uint32_t>(inputSamplePos);
+					float fractionalPart = inputSamplePos - static_cast<float>(inputSampleIndex);
+
+					// Ensure we don't go out of bounds
+					if (inputSampleIndex >= inputPacketDesc.num_samples())
+					{
+						inputSampleIndex = inputPacketDesc.num_samples() - 1;
+						fractionalPart = 0.0f;
+					}
+
+					for (uint32_t outputChannel = 0; outputChannel < outputChannelCount; ++outputChannel)
+					{
+						float outputSampleValue;
+						if (outputChannel < inputPacketDesc.channel_count())
+						{
+							int32_t currentSample = inputAudioSamples[inputSampleIndex * inputPacketDesc.channel_count() + outputChannel];
+							float currentValue = ShiftedInt24ToFloat(currentSample);
+
+							if (inputSampleIndex + 1 < inputPacketDesc.num_samples() && fractionalPart > 0.0f)
+							{
+								int32_t nextSample = inputAudioSamples[(inputSampleIndex + 1) * inputPacketDesc.channel_count() + outputChannel];
+								float nextValue = ShiftedInt24ToFloat(nextSample);
+
+								// TODO: Add different interpolation methods
+								outputSampleValue = currentValue + (nextValue - currentValue) * fractionalPart;
+							}
+							else
+							{
+								outputSampleValue = currentValue;
+							}
+						}
+						else
+						{
+							outputSampleValue = 0.0f;
+						}
+
+						// Convert back to 24-bit shifted format and store
+						outputAudioSamples[outputSample * outputChannelCount + outputChannel] = FloatToShiftedInt24(outputSampleValue);
+					}
+				}
+			}
 		}
 
-		// Sample rate conversion ratio
-		float sampleRateRatio = static_cast<float>(inputPacketDesc.sample_rate()) / static_cast<float>(outputSampleRate);
-		
-		for (uint32_t outputSample = 0; outputSample < outputNumSamples; ++outputSample)
-		{
-			// Calculate the corresponding input sample position (with fractional part for interpolation)
-			float inputSamplePos = static_cast<float>(outputSample) * sampleRateRatio;
-			uint32_t inputSampleIndex = static_cast<uint32_t>(inputSamplePos);
-			float fractionalPart = inputSamplePos - static_cast<float>(inputSampleIndex);
-			
-			// Ensure we don't go out of bounds
-			if (inputSampleIndex >= inputPacketDesc.num_samples())
-			{
-				inputSampleIndex = inputPacketDesc.num_samples() - 1;
-				fractionalPart = 0.0f;
-			}
-			
-			for (uint32_t outputChannel = 0; outputChannel < outputChannelCount; ++outputChannel)
-			{
-				float outputSampleValue;
-				if (outputChannel < inputPacketDesc.channel_count())
-				{
-					int32_t currentSample = inputAudioSamples[inputSampleIndex * inputPacketDesc.channel_count() + outputChannel];
-					float currentValue = ShiftedInt24ToFloat(currentSample);
-					
-					if (inputSampleIndex + 1 < inputPacketDesc.num_samples() && fractionalPart > 0.0f)
-					{
-						int32_t nextSample = inputAudioSamples[(inputSampleIndex + 1) * inputPacketDesc.channel_count() + outputChannel];
-						float nextValue = ShiftedInt24ToFloat(nextSample);
-						
-						// TODO: Add different interpolation methods
-						outputSampleValue = currentValue + (nextValue - currentValue) * fractionalPart;
-					}
-					else
-					{
-						outputSampleValue = currentValue;
-					}
-				}
-				else
-				{
-					outputSampleValue = 0.0f;
-				}
-				
-				// Convert back to 24-bit shifted format and store
-				outputAudioSamples[outputSample * outputChannelCount + outputChannel] = FloatToShiftedInt24(outputSampleValue);
-			}
-		}
-		
 		// Create output audio packet descriptor
 		AudioPacketDescriptor outputPacketDesc(
 			outputSampleRate, outputNumSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, sizeof(int32_t), outputChannelCount);

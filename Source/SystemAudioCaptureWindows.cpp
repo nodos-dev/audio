@@ -5,7 +5,6 @@
 #include "SystemAudioCapture.h"
 
 #include <atomic>
-#include <chrono>
 #include <thread>
 
 #include <Windows.h>
@@ -33,7 +32,10 @@ public:
 		CoUninitialize();
 	}
 
-	bool Initialize(uint32_t sampleRate, uint8_t channelCount) override
+	// Loopback capture is locked to the render endpoint's shared-mode mix
+	// format; DrainSamples reports that negotiated format back and the node
+	// labels the packet with it.
+	bool Initialize() override
 	{
 		IMMDeviceEnumeratorPtr enumerator;
 		if (FAILED(enumerator.CreateInstance(__uuidof(MMDeviceEnumerator))))
@@ -77,7 +79,7 @@ public:
 
 		const HRESULT initHr = AudioClient->Initialize(
 			AUDCLNT_SHAREMODE_SHARED,
-			AUDCLNT_STREAMFLAGS_LOOPBACK,
+			AUDCLNT_STREAMFLAGS_LOOPBACK | AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
 			10'000'000, // 1 second buffer in 100-ns units
 			0,
 			mixFormat,
@@ -96,8 +98,6 @@ public:
 
 		SourceSampleRate = negotiatedRate;
 		SourceChannelCount = negotiatedChannels;
-		TargetSampleRate = sampleRate;
-		TargetChannelCount = channelCount;
 
 		if (FAILED(AudioClient->GetService(__uuidof(IAudioCaptureClient), (void**)&CaptureClient)))
 		{
@@ -115,13 +115,32 @@ public:
 			return true;
 		if (!AudioClient)
 			return false;
+
+		// Auto-reset buffer-ready event signaled by the audio engine each period;
+		// manual-reset stop event to wake the thread out of its wait on teardown.
+		AudioReadyEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+		StopEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+		if (!AudioReadyEvent || !StopEvent)
+		{
+			LastError = "Failed to create capture events";
+			CloseEvents();
+			return false;
+		}
+
+		if (FAILED(AudioClient->SetEventHandle(AudioReadyEvent)))
+		{
+			LastError = "Failed to set capture event handle";
+			CloseEvents();
+			return false;
+		}
+
 		if (FAILED(AudioClient->Start()))
 		{
 			LastError = "Failed to start audio client";
+			CloseEvents();
 			return false;
 		}
 		IsCapturing = true;
-		ShouldStop = false;
 		CaptureThread = std::thread(&WASAPICapture::CaptureThreadFunc, this);
 		return true;
 	}
@@ -130,19 +149,44 @@ public:
 	{
 		if (!IsCapturing)
 			return;
-		ShouldStop = true;
+		if (StopEvent)
+			SetEvent(StopEvent);
 		if (CaptureThread.joinable())
 			CaptureThread.join();
 		if (AudioClient)
 			AudioClient->Stop();
 		IsCapturing = false;
+		CloseEvents();
 	}
 
 private:
+	void CloseEvents()
+	{
+		if (AudioReadyEvent)
+		{
+			CloseHandle(AudioReadyEvent);
+			AudioReadyEvent = nullptr;
+		}
+		if (StopEvent)
+		{
+			CloseHandle(StopEvent);
+			StopEvent = nullptr;
+		}
+	}
+
 	void CaptureThreadFunc()
 	{
-		while (!ShouldStop)
+		const HANDLE waits[2] = {StopEvent, AudioReadyEvent};
+		while (true)
 		{
+			// Block until the engine signals a buffer is ready, or Stop() signals
+			// teardown. No timeout: during digital silence the engine simply
+			// doesn't signal, which is correct — there's nothing to capture.
+			const DWORD wr = WaitForMultipleObjects(2, waits, FALSE, INFINITE);
+			if (wr == WAIT_OBJECT_0) // StopEvent
+				break;
+			if (wr != WAIT_OBJECT_0 + 1) // anything but buffer-ready (failed/abandoned)
+				break;
 			if (!CaptureClient)
 				break;
 
@@ -172,8 +216,6 @@ private:
 				if (FAILED(CaptureClient->GetNextPacketSize(&packetLength)))
 					break;
 			}
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 	}
 
@@ -181,7 +223,8 @@ private:
 	IAudioCaptureClientPtr CaptureClient;
 	std::thread CaptureThread;
 	std::atomic<bool> IsCapturing{false};
-	std::atomic<bool> ShouldStop{false};
+	HANDLE AudioReadyEvent = nullptr;
+	HANDLE StopEvent = nullptr;
 };
 } // namespace
 

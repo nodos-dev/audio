@@ -62,7 +62,7 @@ class ScreenCaptureKitCapture : public SystemAudioCaptureBase
 public:
 	~ScreenCaptureKitCapture() override { Stop(); }
 
-	bool Initialize(uint32_t sampleRate, uint8_t channelCount) override;
+	bool Initialize() override;
 	bool Start() override;
 	void Stop() override;
 
@@ -144,13 +144,15 @@ bool PumpMainRunLoopUntil(const bool& done, double timeoutSeconds)
 }
 } // namespace
 
-bool ScreenCaptureKitCapture::Initialize(uint32_t sampleRate, uint8_t channelCount)
+bool ScreenCaptureKitCapture::Initialize()
 {
+	// ScreenCaptureKit requires a concrete output format; capture at a fixed
+	// default and let the node label packets with it.
+	constexpr uint32_t CAPTURE_SAMPLE_RATE = 48000;
+	constexpr uint8_t CAPTURE_CHANNEL_COUNT = 2;
+
 	if (@available(macOS 13.0, *))
 	{
-		TargetSampleRate = sampleRate;
-		TargetChannelCount = channelCount;
-
 		bool ok = false;
 		RunOnMainThreadSync([&] {
 			@autoreleasepool
@@ -190,8 +192,8 @@ bool ScreenCaptureKitCapture::Initialize(uint32_t sampleRate, uint8_t channelCou
 						SCStreamConfiguration* config = [[SCStreamConfiguration alloc] init];
 						config.capturesAudio = YES;
 						config.excludesCurrentProcessAudio = NO;
-						config.sampleRate = (NSInteger)sampleRate;
-						config.channelCount = (NSInteger)channelCount;
+						config.sampleRate = (NSInteger)CAPTURE_SAMPLE_RATE;
+						config.channelCount = (NSInteger)CAPTURE_CHANNEL_COUNT;
 						// ScreenCaptureKit on macOS 13–14 still requires a video track
 						// to be configured even for audio-only capture. A 2×2, 1 fps
 						// track is the cheapest legal configuration and we never attach
@@ -430,8 +432,8 @@ std::unique_ptr<ISystemAudioCapture> ISystemAudioCapture::Create()
 - (void)stream:(SCStream*)stream didStopWithError:(NSError*)error
 {
 	// Surface nothing here directly; the node already displays a warning when
-	// ReadSamples returns silence. Recording the error on the backend would
-	// race with Stop() tearing everything down, so we keep the hook empty.
+	// capture goes inactive. Recording the error on the backend would race with
+	// Stop() tearing everything down, so we keep the hook empty.
 }
 @end
 
