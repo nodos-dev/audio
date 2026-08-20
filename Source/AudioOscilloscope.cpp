@@ -7,6 +7,7 @@
 #include <complex>
 #include <chrono>
 
+#include "NodeErrors.h"
 #include "nosAudio/Audio_generated.h"
 #include "nosAudio/AudioConversions.hpp"
 
@@ -19,6 +20,14 @@ namespace nos::audio
 
 struct AudioOscilloscopeNode : NodeContext
 {
+	// What the node is complaining about, so each problem can be raised and
+	// cleared on its own.
+	enum class ErrorType
+	{
+		Input,
+		Output,
+	};
+
 	nosResult OnCreate(nosFbNodePtr) override
 	{
 		StartTime = std::chrono::high_resolution_clock::now();
@@ -39,12 +48,21 @@ struct AudioOscilloscopeNode : NodeContext
 		nosEngine.ObjectAPI->GetField(inputPacket, NOS_NAME("desc"), &packetDescObj.GetStorage());
 		nosEngine.ObjectAPI->GetField(inputPacket, NOS_NAME("buffer"), &inputAudioBuf.GetStorage());
 
+		// Never fail out of here: a failed node ends the path, and the rest of it,
+		// signalling the GPU among it, then never happens.
 		if (!packetDescObj || !inputAudioBuf)
-			return NOS_RESULT_FAILURE;
+		{
+			Errors.Set(ErrorType::Input, fb::NodeStatusMessageType::WARNING, "No audio packet to draw",
+				"Whatever feeds this node has not produced a packet.");
+			return NOS_RESULT_SUCCESS;
+		}
 
 		nosImmutableBuffer descBuf{};
 		if (NOS_RESULT_SUCCESS != nosEngine.ObjectAPI->GetObjectDataView(packetDescObj, &descBuf))
-			return NOS_RESULT_FAILURE;
+		{
+			Errors.Set(ErrorType::Input, fb::NodeStatusMessageType::WARNING, "Audio packet has no readable descriptor");
+			return NOS_RESULT_SUCCESS;
+		}
 		auto& inputPacketDesc = *static_cast<const AudioPacketDescriptor*>(descBuf.Data);
 
 		auto outputTexture = pins.GetPinObject<sys::vulkan::Texture>(NOS_NAME("Output"));
@@ -61,7 +79,12 @@ struct AudioOscilloscopeNode : NodeContext
 		// Map input audio buffer
 		int32_t* inputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(inputAudioBuf));
 		if (!inputAudioSamples)
-			return NOS_RESULT_FAILED;
+		{
+			Errors.Set(ErrorType::Input, fb::NodeStatusMessageType::WARNING, "Audio packet cannot be read",
+				"Its buffer has to be host visible for this node to draw it.");
+			return NOS_RESULT_SUCCESS;
+		}
+		Errors.Clear(ErrorType::Input);
 
 		// Process audio to extract amplitude levels for oscilloscope display
 		uint32_t numSamples = inputPacketDesc.num_samples();
@@ -102,7 +125,11 @@ struct AudioOscilloscopeNode : NodeContext
 			
 			ScopeTexture = sys::vulkan::CreateTexture(texInfo, "AudioOscilloscope TraceTexture");
 			if (!ScopeTexture)
-				return NOS_RESULT_FAILED;
+			{
+				Errors.Set(ErrorType::Output, fb::NodeStatusMessageType::FAILURE, "Cannot create the trace texture",
+					"Asked for " + std::to_string(scopeTexSize) + " by 1 pixels.");
+				return NOS_RESULT_SUCCESS;
+			}
 		}
 
 		std::vector<float> currentFrameData(scopeTexSize);
@@ -165,8 +192,8 @@ struct AudioOscilloscopeNode : NodeContext
 		if (loadResult != NOS_RESULT_SUCCESS)
 		{
 			nosVulkan->End(cmd, nullptr);
-			nosEngine.LogE("AudioOscilloscope: Failed to upload trace texture data");
-			return NOS_RESULT_FAILED;
+			Errors.Set(ErrorType::Output, fb::NodeStatusMessageType::FAILURE, "Cannot upload the trace texture");
+			return NOS_RESULT_SUCCESS;
 		}
 
 		nosVulkan->End(cmd, nullptr);
@@ -204,9 +231,12 @@ struct AudioOscilloscopeNode : NodeContext
 		nosVulkan->RunPass(cmd, &passParams);
 		nosVulkan->End(cmd, nullptr);
 
+		Errors.Clear(ErrorType::Output);
+
 		return NOS_RESULT_SUCCESS;
 	}
 
+	NodeErrors<ErrorType> Errors{*this};
 	TypedObjectRef<sys::vulkan::Texture> ScopeTexture;
 	std::chrono::high_resolution_clock::time_point StartTime;
 	
