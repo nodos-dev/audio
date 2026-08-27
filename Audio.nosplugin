@@ -10,6 +10,14 @@
 			{
 				"name": "nos.sys.vulkan",
 				"version": "8.0"
+			},
+			{
+				"name": "nos.sync",
+				"version": "12.0"
+			},
+			{
+				"name": "nos.reflect",
+				"version": "3.0"
 			}
 		],
 		"category": "Audio"
