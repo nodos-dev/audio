@@ -1,1321 +1,2413 @@
-{
-	"nodes": [
-		{
-			"class_name": "nos.audio.UnpackResample",
+{ "schema_version": "1.4-v1", "nodes": [
+    {
+      "class_name": "nos.audio.UnpackResample",
 			"menu_info": {
 				"category": "Audio",
 				"display_name": "Unpack & Resample"
 			},
-			"node": {
-				"id": "68128daa-1754-4afc-9fc9-2ded2d3f311a",
-				"name": "UnpackResample",
-				"class_name": "nos.audio.UnpackResample",
-				"pins": [
-					{
-						"id": "438d089f-4176-450d-8534-1fc93293f7b3",
-						"name": "Input",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "INPUT_PIN",
-						"can_show_as": "INPUT_PIN_ONLY",
-						"data": {
-							"handle": 1747643889552,
-							"offset": 32204608,
-							"size_in_bytes": 9024,
-							"alignment": 0,
-							"external_memory": {
-								"handle_type": 2,
-								"handle": 3488,
-								"allocation_size": 33554432,
-								"pid": 19724
-							},
-							"usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
-							"memory_flags": "NONE",
-							"element_type": "ELEMENT_TYPE_UNDEFINED",
-							"field_type": "PROGRESSIVE"
-						},
-						"def": {
-							"handle": 0,
-							"offset": 0,
-							"size_in_bytes": 0,
-							"alignment": 0,
-							"external_memory": {
-								"handle_type": 0,
-								"handle": 0,
-								"allocation_size": 0,
-								"pid": 0
-							},
-							"usage": "NONE",
-							"memory_flags": "NONE",
-							"element_type": "ELEMENT_TYPE_UNDEFINED",
-							"field_type": "UNKNOWN"
-						},
-						"contents_type": "PortalPin",
-						"contents": {
-							"source_id": "8c0784f2-d102-4110-ae74-5ed3b1dd4971"
-						},
-						"orphan_state": {}
-					},
-					{
-						"id": "e76a9dea-ac0a-4ad1-8681-d2d62fef63f2",
-						"name": "OutputAudioPacketDescriptor",
-						"type_name": "nos.audio.AudioPacketDescriptor",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY",
-						"data": {
-							"sample_rate": 48000,
-							"num_samples": 1024,
-							"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-							"sample_stride": 4,
-							"channel_count": 8
-						},
-						"contents_type": "PortalPin",
-						"contents": {
-							"source_id": "c8cf24eb-c2f6-4283-abb3-cf419952e49b"
-						},
-						"orphan_state": {},
-						"display_name": "Out Audio Packet Descriptor"
-					},
-					{
-						"id": "ccc1d3ac-2276-468a-9c0c-b0783ca50b9b",
-						"name": "OutputAudio",
-						"type_name": "nos.sys.vulkan.Buffer",
-						"show_as": "OUTPUT_PIN",
-						"can_show_as": "OUTPUT_PIN_ONLY",
-						"data": {
-							"handle": 1747643875552,
-							"offset": 3152,
-							"size_in_bytes": 36044,
-							"alignment": 0,
-							"external_memory": {
-								"handle_type": 2,
-								"handle": 7060,
-								"allocation_size": 33554432,
-								"pid": 19724
-							},
-							"usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
-							"memory_flags": "HOST_VISIBLE",
-							"element_type": "ELEMENT_TYPE_INT32",
-							"field_type": "PROGRESSIVE"
-						},
-						"def": {
-							"handle": 0,
-							"offset": 0,
-							"size_in_bytes": 0,
-							"alignment": 0,
-							"external_memory": {
-								"handle_type": 0,
-								"handle": 0,
-								"allocation_size": 0,
-								"pid": 0
-							},
-							"usage": "NONE",
-							"memory_flags": "NONE",
-							"element_type": "ELEMENT_TYPE_UNDEFINED",
-							"field_type": "UNKNOWN"
-						},
-						"contents_type": "PortalPin",
-						"contents": {
-							"source_id": "422800f8-0b16-4a91-9e9b-7416d85515b3"
-						},
-						"orphan_state": {},
-						"display_name": "Out Audio Packet"
-					},
-					{
-						"id": "bebf0254-a40a-4fff-8cee-7f4b0754dcb3",
-						"name": "OutputSampleRate",
-						"type_name": "uint",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 48000,
-						"contents_type": "PortalPin",
-						"contents": {
-							"source_id": "cdc2eae5-1ce5-46ad-b831-a287adb55e1f"
-						},
-						"orphan_state": {}
-					},
-					{
-						"id": "25936cfd-c0d9-4f16-bee6-08dc7e243a3b",
-						"name": "OutputChannelCount",
-						"type_name": "uint",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 8,
-						"contents_type": "PortalPin",
-						"contents": {
-							"source_id": "4378cef1-f776-4259-89f1-94c7e72fd4e0"
-						},
-						"orphan_state": {}
-					},
-					{
-						"id": "f56fea39-0b6e-4846-bd24-6ed7c19ef59c",
-						"name": "Size",
-						"type_name": "uint",
-						"show_as": "PROPERTY",
-						"can_show_as": "INPUT_PIN_OR_PROPERTY",
-						"data": 1,
-						"contents_type": "PortalPin",
-						"contents": {
-							"source_id": "3caacb0a-f0bf-49e0-afc2-87fd078a2de2"
-						},
-						"orphan_state": {}
-					}
-				],
-				"pos": {
-					"x": 0.0,
-					"y": 0.0
-				},
-				"contents_type": "Graph",
-				"contents": {
-					"nodes": [
-						{
-							"id": "ab8e664d-7820-4883-ab44-1126d804ef3c",
-							"name": "RingBuffer",
-							"class_name": "nos.utilities.RingBuffer",
-							"pins": [
-								{
-									"id": "0eeb7449-cccf-4304-a4ce-c191fb9e4fa4",
-									"name": "Thread",
-									"type_name": "nos.exe",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_ONLY",
-									"data": {},
-									"def": {},
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {}
-								},
-								{
-									"id": "45e46a86-bb3a-45fb-b60e-8abe84520d65",
-									"name": "Size",
-									"type_name": "uint",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"data": 3,
-									"min": 1,
-									"max": 120,
-									"def": 2,
-									"step": 1.19,
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {}
-								},
-								{
-									"id": "914190d6-3a04-4150-a920-a65d82f0ef1f",
-									"name": "Spare",
-									"type_name": "uint",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"data": 0,
-									"min": 0,
-									"max": 119,
-									"def": 0,
-									"step": 1.19,
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {}
-								},
-								{
-									"id": "5d5ecb40-6631-405b-bcec-c4080af45cba",
-									"name": "Alignment",
-									"type_name": "uint",
-									"show_as": "PROPERTY",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"data": 0,
-									"def": 0,
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {},
-									"description": "Used for creating memory-aligned buffers in memory"
-								},
-								{
-									"id": "e484a622-8624-45a5-8aa1-e27defaba9d9",
-									"name": "Input",
-									"type_name": "nos.sys.vulkan.Buffer",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_ONLY",
-									"data": {
-										"handle": 1747643889552,
-										"offset": 32204608,
-										"size_in_bytes": 9024,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 2,
-											"handle": 3488,
-											"allocation_size": 33554432,
-											"pid": 19724
-										},
-										"usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "PROGRESSIVE"
-									},
-									"def": {
-										"handle": 0,
-										"offset": 0,
-										"size_in_bytes": 0,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 0,
-											"handle": 0,
-											"allocation_size": 0,
-											"pid": 0
-										},
-										"usage": "NONE",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "UNKNOWN"
-									},
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {}
-								},
-								{
-									"id": "593ea04c-fd29-493a-9c9d-99c0030ef8e3",
-									"name": "Output",
-									"type_name": "nos.sys.vulkan.Buffer",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"data": {
-										"handle": 1747643894752,
-										"offset": 11088320,
-										"size_in_bytes": 9024,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 2,
-											"handle": 1328,
-											"allocation_size": 33554432,
-											"pid": 19724
-										},
-										"usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
-										"memory_flags": "HOST_VISIBLE DOWNLOAD",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "PROGRESSIVE"
-									},
-									"def": {
-										"handle": 0,
-										"offset": 0,
-										"size_in_bytes": 0,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 0,
-											"handle": 0,
-											"allocation_size": 0,
-											"pid": 0
-										},
-										"usage": "NONE",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "UNKNOWN"
-									},
-									"live": true,
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {}
-								},
-								{
-									"id": "5021913a-6189-4a9b-8c65-c39f4bdba815",
-									"name": "RepeatWhenFilling",
-									"type_name": "bool",
-									"show_as": "PROPERTY",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"data": false,
-									"def": false,
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {},
-									"description": "Serves the last value while the buffer is being filled instead of waiting",
-									"display_name": "Repeat When Filling"
-								}
-							],
-							"pos": {
-								"x": 866.0,
-								"y": 1107.0
-							},
-							"contents_type": "Job",
-							"contents": {
-								"type": ""
-							},
-							"function_category": "Default Node",
-							"display_name": "Ring Buffer",
-							"plugin_version": {
-								"major": 3,
-								"minor": 25,
-								"patch": 2
-							}
-						},
-						{
-							"id": "5e3e0b28-d20f-4a41-b1f4-9f149205eedd",
-							"name": "Thread",
-							"class_name": "nos.Thread",
-							"always_execute": true,
-							"pins": [
-								{
-									"id": "6a010152-3d5a-4d99-abd9-82fe484a3e2b",
-									"name": "Run",
-									"type_name": "nos.exe",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"data": {},
-									"def": {},
-									"live": true,
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {}
-								},
-								{
-									"id": "5c6346e0-0048-448f-a211-678c802a0fcb",
-									"name": "Importance",
-									"type_name": "ulong",
-									"show_as": "PROPERTY",
-									"can_show_as": "PROPERTY_ONLY",
-									"data": 0,
-									"def": 0,
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {}
-								}
-							],
-							"pos": {
-								"x": 686.0,
-								"y": 1073.0
-							},
-							"contents_type": "Job",
-							"contents": {
-								"type": ""
-							},
-							"function_category": "Default Node",
-							"plugin_version": {
-								"major": 0,
-								"minor": 0,
-								"patch": 0
-							}
-						},
-						{
-							"id": "b0682608-63fd-45e4-a79c-462af186e32c",
-							"name": "UnpackAudioBuffer",
-							"class_name": "nos.audio.UnpackAudioBuffer",
-							"always_execute": true,
-							"pins": [
-								{
-									"id": "6e8fab4a-2e05-48c7-abed-03bd12f55d2d",
-									"name": "PrefixedAudioBuffer",
-									"type_name": "nos.sys.vulkan.Buffer",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"data": {
-										"handle": 1747643894752,
-										"offset": 11088320,
-										"size_in_bytes": 9024,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 2,
-											"handle": 1328,
-											"allocation_size": 33554432,
-											"pid": 19724
-										},
-										"usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
-										"memory_flags": "HOST_VISIBLE DOWNLOAD",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "PROGRESSIVE"
-									},
-									"def": {
-										"handle": 0,
-										"offset": 0,
-										"size_in_bytes": 0,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 0,
-											"handle": 0,
-											"allocation_size": 0,
-											"pid": 0
-										},
-										"usage": "NONE",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "UNKNOWN"
-									},
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {}
-								},
-								{
-									"id": "2a16b5da-0d28-48e1-9ec0-e973ef0b6e1f",
-									"name": "AudioPacketDescriptor",
-									"type_name": "nos.audio.AudioPacketDescriptor",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"data": {
-										"sample_rate": 48000,
-										"num_samples": 1024,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 4,
-										"channel_count": 2
-									},
-									"min": {
-										"sample_rate": 0,
-										"num_samples": 0,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 0,
-										"channel_count": 0
-									},
-									"max": {
-										"sample_rate": 0,
-										"num_samples": 0,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 0,
-										"channel_count": 0
-									},
-									"def": {
-										"sample_rate": 0,
-										"num_samples": 0,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 0,
-										"channel_count": 0
-									},
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									}
-								},
-								{
-									"id": "a3cd17f0-07f6-4d1d-b8c1-818ee0968454",
-									"name": "Audio",
-									"type_name": "nos.sys.vulkan.Buffer",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"data": {
-										"handle": 1747643892752,
-										"offset": 109376,
-										"size_in_bytes": 9011,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 2,
-											"handle": 7060,
-											"allocation_size": 33554432,
-											"pid": 19724
-										},
-										"usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
-										"memory_flags": "HOST_VISIBLE",
-										"element_type": "ELEMENT_TYPE_INT32",
-										"field_type": "PROGRESSIVE"
-									},
-									"def": {
-										"handle": 0,
-										"offset": 0,
-										"size_in_bytes": 0,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 0,
-											"handle": 0,
-											"allocation_size": 0,
-											"pid": 0
-										},
-										"usage": "NONE",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "UNKNOWN"
-									},
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {}
-								}
-							],
-							"pos": {
-								"x": 1128.0,
-								"y": 1084.0
-							},
-							"contents_type": "Job",
-							"contents": {
-								"type": ""
-							},
-							"function_category": "Default Node",
-							"plugin_version": {
-								"major": 0,
-								"minor": 1,
-								"patch": 0
-							}
-						},
-						{
-							"id": "d4ba6620-2193-4b09-a219-3d0d0ea6a56b",
-							"name": "OutputAudio",
-							"class_name": "nos.internal.GraphOutput",
-							"pins": [
-								{
-									"id": "72511305-9801-4229-8f13-f9c9209ec20a",
-									"name": "Input",
-									"type_name": "nos.sys.vulkan.Buffer",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_ONLY",
-									"data": {
-										"handle": 1747643875552,
-										"offset": 3152,
-										"size_in_bytes": 36044,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 2,
-											"handle": 7060,
-											"allocation_size": 33554432,
-											"pid": 19724
-										},
-										"usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
-										"memory_flags": "HOST_VISIBLE",
-										"element_type": "ELEMENT_TYPE_INT32",
-										"field_type": "PROGRESSIVE"
-									},
-									"def": {
-										"handle": 0,
-										"offset": 0,
-										"size_in_bytes": 0,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 0,
-											"handle": 0,
-											"allocation_size": 0,
-											"pid": 0
-										},
-										"usage": "NONE",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "UNKNOWN"
-									},
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									},
-									"display_name": "Out Audio Packet"
-								},
-								{
-									"id": "422800f8-0b16-4a91-9e9b-7416d85515b3",
-									"name": "Output",
-									"type_name": "nos.sys.vulkan.Buffer",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"data": {
-										"handle": 1747643875552,
-										"offset": 3152,
-										"size_in_bytes": 36044,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 2,
-											"handle": 7060,
-											"allocation_size": 33554432,
-											"pid": 19724
-										},
-										"usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
-										"memory_flags": "HOST_VISIBLE",
-										"element_type": "ELEMENT_TYPE_INT32",
-										"field_type": "PROGRESSIVE"
-									},
-									"referred_by": [
-										"ccc1d3ac-2276-468a-9c0c-b0783ca50b9b"
-									],
-									"def": {
-										"handle": 0,
-										"offset": 0,
-										"size_in_bytes": 0,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 0,
-											"handle": 0,
-											"allocation_size": 0,
-											"pid": 0
-										},
-										"usage": "NONE",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "UNKNOWN"
-									},
-									"meta_data_map": [
-										{
-											"key": "PinHidden",
-											"value": "true"
-										}
-									],
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									},
-									"display_name": "Out Audio Packet"
-								}
-							],
-							"pos": {
-								"x": 1834.0,
-								"y": 1112.0
-							},
-							"contents_type": "Job",
-							"contents": {
-								"type": ""
-							},
-							"function_category": "Default Node",
-							"plugin_version": {
-								"major": 0,
-								"minor": 0,
-								"patch": 0
-							}
-						},
-						{
-							"id": "893fc91c-9c70-451c-90c4-bca4d3e82f76",
-							"name": "Resample",
-							"class_name": "nos.audio.Resample",
-							"pins": [
-								{
-									"id": "eee4c9a5-f511-475b-b43c-e98adea1af89",
-									"name": "InputAudioPacketDescriptor",
-									"type_name": "nos.audio.AudioPacketDescriptor",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_ONLY",
-									"data": {
-										"sample_rate": 48000,
-										"num_samples": 1024,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 4,
-										"channel_count": 2
-									},
-									"min": {
-										"sample_rate": 0,
-										"num_samples": 0,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 0,
-										"channel_count": 0
-									},
-									"max": {
-										"sample_rate": 0,
-										"num_samples": 0,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 0,
-										"channel_count": 0
-									},
-									"def": {
-										"sample_rate": 0,
-										"num_samples": 0,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 0,
-										"channel_count": 0
-									},
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									},
-									"display_name": "In Audio Packet Descriptor"
-								},
-								{
-									"id": "9b275680-5242-401c-9a11-9e26f7018996",
-									"name": "InputAudio",
-									"type_name": "nos.sys.vulkan.Buffer",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_ONLY",
-									"data": {
-										"handle": 1747643892752,
-										"offset": 109376,
-										"size_in_bytes": 9011,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 2,
-											"handle": 7060,
-											"allocation_size": 33554432,
-											"pid": 19724
-										},
-										"usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
-										"memory_flags": "HOST_VISIBLE",
-										"element_type": "ELEMENT_TYPE_INT32",
-										"field_type": "PROGRESSIVE"
-									},
-									"def": {
-										"handle": 0,
-										"offset": 0,
-										"size_in_bytes": 0,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 0,
-											"handle": 0,
-											"allocation_size": 0,
-											"pid": 0
-										},
-										"usage": "NONE",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "UNKNOWN"
-									},
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {},
-									"display_name": "In Audio Packet"
-								},
-								{
-									"id": "d185c323-a1e1-4a3f-b95b-c1361fdb6473",
-									"name": "OutputSampleRate",
-									"type_name": "uint",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"data": 48000,
-									"def": 48000,
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {},
-									"display_name": "Out Sample Rate"
-								},
-								{
-									"id": "8c900380-2070-4836-b09f-9ea8d75be2f4",
-									"name": "OutputChannelCount",
-									"type_name": "uint",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"data": 8,
-									"def": 2,
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {},
-									"display_name": "Out Channel Count"
-								},
-								{
-									"id": "21ceae10-4729-4127-b425-e78a54c432fd",
-									"name": "OutputAudioPacketDescriptor",
-									"type_name": "nos.audio.AudioPacketDescriptor",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"data": {
-										"sample_rate": 48000,
-										"num_samples": 1024,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 4,
-										"channel_count": 8
-									},
-									"min": {
-										"sample_rate": 0,
-										"num_samples": 0,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 0,
-										"channel_count": 0
-									},
-									"max": {
-										"sample_rate": 0,
-										"num_samples": 0,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 0,
-										"channel_count": 0
-									},
-									"def": {
-										"sample_rate": 0,
-										"num_samples": 0,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 0,
-										"channel_count": 0
-									},
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									},
-									"display_name": "Out Audio Packet Descriptor"
-								},
-								{
-									"id": "8880170b-fb48-49b8-a281-ded85c52e6b0",
-									"name": "OutputAudio",
-									"type_name": "nos.sys.vulkan.Buffer",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"data": {
-										"handle": 1747643875552,
-										"offset": 3152,
-										"size_in_bytes": 36044,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 2,
-											"handle": 7060,
-											"allocation_size": 33554432,
-											"pid": 19724
-										},
-										"usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
-										"memory_flags": "HOST_VISIBLE",
-										"element_type": "ELEMENT_TYPE_INT32",
-										"field_type": "PROGRESSIVE"
-									},
-									"def": {
-										"handle": 0,
-										"offset": 0,
-										"size_in_bytes": 0,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 0,
-											"handle": 0,
-											"allocation_size": 0,
-											"pid": 0
-										},
-										"usage": "NONE",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "UNKNOWN"
-									},
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {},
-									"display_name": "Out Audio Packet"
-								}
-							],
-							"pos": {
-								"x": 1507.0,
-								"y": 1104.0
-							},
-							"contents_type": "Job",
-							"contents": {
-								"type": ""
-							},
-							"function_category": "Default Node",
-							"description": "Resamples audio to different sample rate and channel count",
-							"display_name": "Audio Resample",
-							"plugin_version": {
-								"major": 0,
-								"minor": 1,
-								"patch": 0
-							}
-						},
-						{
-							"id": "b37b1008-a32c-40b3-a441-f148fc3e6d7e",
-							"name": "OutputSampleRate",
-							"class_name": "nos.internal.GraphInput",
-							"pins": [
-								{
-									"id": "51feb6d7-4abf-45f8-bbb6-85bc45cd07f0",
-									"name": "Output",
-									"type_name": "uint",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"data": 48000,
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									}
-								},
-								{
-									"id": "cdc2eae5-1ce5-46ad-b831-a287adb55e1f",
-									"name": "Input",
-									"type_name": "uint",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"data": 48000,
-									"referred_by": [
-										"bebf0254-a40a-4fff-8cee-7f4b0754dcb3"
-									],
-									"meta_data_map": [
-										{
-											"key": "PinHidden",
-											"value": "true"
-										}
-									],
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									}
-								}
-							],
-							"pos": {
-								"x": 1170.0,
-								"y": 1159.0
-							},
-							"contents_type": "Job",
-							"contents": {
-								"type": ""
-							},
-							"function_category": "Default Node",
-							"display_name": "Out Sample Rate",
-							"plugin_version": {
-								"major": 0,
-								"minor": 0,
-								"patch": 0
-							}
-						},
-						{
-							"id": "b44a9ace-bf52-4316-99bc-baf80d783d5b",
-							"name": "Input",
-							"class_name": "nos.internal.GraphInput",
-							"pins": [
-								{
-									"id": "16806641-377f-4564-873b-a14af492c3b0",
-									"name": "Output",
-									"type_name": "nos.sys.vulkan.Buffer",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"data": {
-										"handle": 1747643889552,
-										"offset": 32204608,
-										"size_in_bytes": 9024,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 2,
-											"handle": 3488,
-											"allocation_size": 33554432,
-											"pid": 19724
-										},
-										"usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "PROGRESSIVE"
-									},
-									"def": {
-										"handle": 0,
-										"offset": 0,
-										"size_in_bytes": 0,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 0,
-											"handle": 0,
-											"allocation_size": 0,
-											"pid": 0
-										},
-										"usage": "NONE",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "UNKNOWN"
-									},
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									}
-								},
-								{
-									"id": "8c0784f2-d102-4110-ae74-5ed3b1dd4971",
-									"name": "Input",
-									"type_name": "nos.sys.vulkan.Buffer",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_ONLY",
-									"data": {
-										"handle": 1747643889552,
-										"offset": 32204608,
-										"size_in_bytes": 9024,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 2,
-											"handle": 3488,
-											"allocation_size": 33554432,
-											"pid": 19724
-										},
-										"usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "PROGRESSIVE"
-									},
-									"referred_by": [
-										"438d089f-4176-450d-8534-1fc93293f7b3"
-									],
-									"def": {
-										"handle": 0,
-										"offset": 0,
-										"size_in_bytes": 0,
-										"alignment": 0,
-										"external_memory": {
-											"handle_type": 0,
-											"handle": 0,
-											"allocation_size": 0,
-											"pid": 0
-										},
-										"usage": "NONE",
-										"memory_flags": "NONE",
-										"element_type": "ELEMENT_TYPE_UNDEFINED",
-										"field_type": "UNKNOWN"
-									},
-									"meta_data_map": [
-										{
-											"key": "PinHidden",
-											"value": "true"
-										}
-									],
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									}
-								}
-							],
-							"pos": {
-								"x": 630.0,
-								"y": 1178.0
-							},
-							"contents_type": "Job",
-							"contents": {
-								"type": ""
-							},
-							"function_category": "Default Node",
-							"plugin_version": {
-								"major": 0,
-								"minor": 0,
-								"patch": 0
-							}
-						},
-						{
-							"id": "c02b8767-26d4-473e-b291-faf5e1314710",
-							"name": "OutputAudioPacketDescriptor",
-							"class_name": "nos.internal.GraphOutput",
-							"pins": [
-								{
-									"id": "6eb469b1-584b-4ada-ad79-8b2bc2182f8c",
-									"name": "Input",
-									"type_name": "nos.audio.AudioPacketDescriptor",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_ONLY",
-									"data": {
-										"sample_rate": 48000,
-										"num_samples": 1024,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 4,
-										"channel_count": 8
-									},
-									"min": {
-										"sample_rate": 0,
-										"num_samples": 0,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 0,
-										"channel_count": 0
-									},
-									"max": {
-										"sample_rate": 0,
-										"num_samples": 0,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 0,
-										"channel_count": 0
-									},
-									"def": {
-										"sample_rate": 0,
-										"num_samples": 0,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 0,
-										"channel_count": 0
-									},
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									},
-									"display_name": "Out Audio Packet Descriptor"
-								},
-								{
-									"id": "c8cf24eb-c2f6-4283-abb3-cf419952e49b",
-									"name": "Output",
-									"type_name": "nos.audio.AudioPacketDescriptor",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"data": {
-										"sample_rate": 48000,
-										"num_samples": 1024,
-										"bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
-										"sample_stride": 4,
-										"channel_count": 8
-									},
-									"referred_by": [
-										"e76a9dea-ac0a-4ad1-8681-d2d62fef63f2"
-									],
-									"meta_data_map": [
-										{
-											"key": "PinHidden",
-											"value": "true"
-										}
-									],
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									},
-									"display_name": "Out Audio Packet Descriptor"
-								}
-							],
-							"pos": {
-								"x": 1856.0,
-								"y": 1071.0
-							},
-							"contents_type": "Job",
-							"contents": {
-								"type": ""
-							},
-							"function_category": "Default Node",
-							"plugin_version": {
-								"major": 0,
-								"minor": 0,
-								"patch": 0
-							}
-						},
-						{
-							"id": "ba1a00f6-3949-4947-84db-28b8bd1b8216",
-							"name": "OutputChannelCount",
-							"class_name": "nos.internal.GraphInput",
-							"pins": [
-								{
-									"id": "558473ba-0604-4f9d-a240-8ddb1ca8a30a",
-									"name": "Output",
-									"type_name": "uint",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"data": 8,
-									"def": 0,
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									}
-								},
-								{
-									"id": "4378cef1-f776-4259-89f1-94c7e72fd4e0",
-									"name": "Input",
-									"type_name": "uint",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"data": 8,
-									"referred_by": [
-										"25936cfd-c0d9-4f16-bee6-08dc7e243a3b"
-									],
-									"meta_data_map": [
-										{
-											"key": "PinHidden",
-											"value": "true"
-										}
-									],
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									}
-								}
-							],
-							"pos": {
-								"x": 1170.0,
-								"y": 1204.0
-							},
-							"contents_type": "Job",
-							"contents": {
-								"type": ""
-							},
-							"function_category": "Default Node",
-							"display_name": "Out Channel Count",
-							"plugin_version": {
-								"major": 0,
-								"minor": 0,
-								"patch": 0
-							}
-						},
-						{
-							"id": "a2ccf7ec-f552-4ee9-906f-3a9bd26779a0",
-							"name": "Size",
-							"class_name": "nos.internal.GraphInput",
-							"pins": [
-								{
-									"id": "e3424c48-8973-485a-b20d-b65efe87e982",
-									"name": "Output",
-									"type_name": "uint",
-									"show_as": "OUTPUT_PIN",
-									"can_show_as": "OUTPUT_PIN_ONLY",
-									"data": 1,
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									}
-								},
-								{
-									"id": "3caacb0a-f0bf-49e0-afc2-87fd078a2de2",
-									"name": "Input",
-									"type_name": "uint",
-									"show_as": "INPUT_PIN",
-									"can_show_as": "INPUT_PIN_OR_PROPERTY",
-									"data": 1,
-									"referred_by": [
-										"f56fea39-0b6e-4846-bd24-6ed7c19ef59c"
-									],
-									"meta_data_map": [
-										{
-											"key": "PinHidden",
-											"value": "true"
-										}
-									],
-									"contents_type": "JobPin",
-									"contents": {},
-									"orphan_state": {
-										"message": ""
-									}
-								}
-							],
-							"pos": {
-								"x": 631.0,
-								"y": 1143.0
-							},
-							"contents_type": "Job",
-							"contents": {
-								"type": ""
-							},
-							"function_category": "Default Node",
-							"display_name": "Ring Size",
-							"plugin_version": {
-								"major": 0,
-								"minor": 0,
-								"patch": 0
-							}
-						}
-					],
-					"connections": [
-						{
-							"from": "8880170b-fb48-49b8-a281-ded85c52e6b0",
-							"to": "72511305-9801-4229-8f13-f9c9209ec20a",
-							"id": "42bcc280-ff2e-4a6c-aa70-db3ccac1f360"
-						},
-						{
-							"from": "6a010152-3d5a-4d99-abd9-82fe484a3e2b",
-							"to": "0eeb7449-cccf-4304-a4ce-c191fb9e4fa4",
-							"id": "d50e79df-9127-44f5-bb83-aead09f99671"
-						},
-						{
-							"from": "21ceae10-4729-4127-b425-e78a54c432fd",
-							"to": "6eb469b1-584b-4ada-ad79-8b2bc2182f8c",
-							"id": "6e5b784d-5c65-4b50-9107-1f67109f751d"
-						},
-						{
-							"from": "593ea04c-fd29-493a-9c9d-99c0030ef8e3",
-							"to": "6e8fab4a-2e05-48c7-abed-03bd12f55d2d",
-							"id": "39b2cf5f-11ea-4053-bd46-83a4ae41aa0e"
-						},
-						{
-							"from": "16806641-377f-4564-873b-a14af492c3b0",
-							"to": "e484a622-8624-45a5-8aa1-e27defaba9d9",
-							"id": "e85cdc94-5ffe-4233-b8ef-ea4c0610b570"
-						},
-						{
-							"from": "a3cd17f0-07f6-4d1d-b8c1-818ee0968454",
-							"to": "9b275680-5242-401c-9a11-9e26f7018996",
-							"id": "dbfda65b-2c15-4f48-95e6-cdd7924086db"
-						},
-						{
-							"from": "2a16b5da-0d28-48e1-9ec0-e973ef0b6e1f",
-							"to": "eee4c9a5-f511-475b-b43c-e98adea1af89",
-							"id": "f9f0e1d7-012b-44d2-b54b-07681be8a75c"
-						},
-						{
-							"from": "51feb6d7-4abf-45f8-bbb6-85bc45cd07f0",
-							"to": "d185c323-a1e1-4a3f-b95b-c1361fdb6473",
-							"id": "8013912a-2664-4403-99a8-ef3bc73bcf58"
-						},
-						{
-							"from": "558473ba-0604-4f9d-a240-8ddb1ca8a30a",
-							"to": "8c900380-2070-4836-b09f-9ea8d75be2f4",
-							"id": "a12b69d2-0c33-4b5e-9b63-1babbf33bd58"
-						},
-						{
-							"from": "e3424c48-8973-485a-b20d-b65efe87e982",
-							"to": "45e46a86-bb3a-45fb-b60e-8abe84520d65",
-							"id": "4418d030-e6f5-40cc-a1a3-1d37da47fdda"
-						}
-					]
-				},
-				"function_category": "Default Node",
-				"plugin_version": {
-					"major": 0,
-					"minor": 0,
-					"patch": 0
-				}
-			}
-		}
-	],
-	"schema_version": "1.4-v1"
-}
+      "node": {
+        "id": "e5148d53-71a5-4ca2-8e59-ff0e495c448d",
+        "name": "UnpackResample",
+        "class_name": "nos.audio.UnpackResample",
+        "pins": [
+          {
+            "id": "f24fcd0f-a920-4de7-9a85-98d06e5dd8e5",
+            "name": "Input",
+            "type_name": "nos.sys.vulkan.Buffer",
+            "show_as": "INPUT_PIN",
+            "can_show_as": "INPUT_PIN_ONLY",
+            "visualizers": [],
+            "data": {
+              "size_in_bytes": 262156,
+              "alignment": 0,
+              "external_memory": {
+                "handle_type": 0,
+                "handle": 0,
+                "allocation_size": 33554432,
+                "pid": 54092,
+                "offset": 5376
+              },
+              "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+              "memory_flags": "DEVICE_MEMORY HOST_VISIBLE",
+              "element_type": "ELEMENT_TYPE_UNDEFINED"
+            },
+            "def": {
+              "size_in_bytes": 0,
+              "alignment": 0,
+              "external_memory": {
+                "handle_type": 0,
+                "handle": 0,
+                "allocation_size": 0,
+                "pid": 0,
+                "offset": 0
+              },
+              "usage": "NONE",
+              "memory_flags": "NONE",
+              "element_type": "ELEMENT_TYPE_UNDEFINED"
+            },
+            "contents_type": "PortalPin",
+            "contents": { "source_id": "17162951-179a-412f-a55b-abed419a0fa9" },
+            "orphan_state": { }
+          },
+          {
+            "id": "d7a005ab-9d9b-4b1e-9b7a-4af500bd101c",
+            "name": "OutputSampleRate",
+            "type_name": "uint",
+            "show_as": "PROPERTY",
+            "can_show_as": "INPUT_PIN_OR_PROPERTY",
+            "visualizers": [],
+            "data": 48000,
+            "def": 48000,
+            "contents_type": "PortalPin",
+            "contents": { "source_id": "ff63ecf8-fad0-4baf-a970-81026a6f64eb" },
+            "orphan_state": { }
+          },
+          {
+            "id": "769748d5-1886-4bcd-ba8c-7abe4ff3bdff",
+            "name": "OutputChannelCount",
+            "type_name": "uint",
+            "show_as": "PROPERTY",
+            "can_show_as": "INPUT_PIN_OR_PROPERTY",
+            "visualizers": [],
+            "data": 6,
+            "def": 8,
+            "contents_type": "PortalPin",
+            "contents": { "source_id": "b3dd757c-0eda-40a3-bbe1-7ac355139ae4" },
+            "orphan_state": { }
+          },
+          {
+            "id": "a600ce89-f633-4a2d-9e21-21a7a24af91e",
+            "name": "Size",
+            "type_name": "uint",
+            "show_as": "PROPERTY",
+            "can_show_as": "INPUT_PIN_OR_PROPERTY",
+            "visualizers": [],
+            "data": 2,
+            "def": 1,
+            "contents_type": "PortalPin",
+            "contents": { "source_id": "df3091b0-4706-48bf-abb2-8fb764950566" },
+            "orphan_state": { }
+          },
+          {
+            "id": "cb075d68-2ed2-4c14-aa03-55cef5a98ad5",
+            "name": "OutputAudioPacket",
+            "type_name": "nos.audio.AudioPacket",
+            "show_as": "OUTPUT_PIN",
+            "can_show_as": "OUTPUT_PIN_ONLY",
+            "visualizers": [],
+            "data": { "desc": {
+                "sample_rate": 48000,
+                "num_samples": 960,
+                "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                "sample_stride": 4,
+                "channel_count": 6
+              }, "buffer": {
+                "size_in_bytes": 27033,
+                "alignment": 0,
+                "external_memory": {
+                  "handle_type": 2,
+                  "handle": 6900,
+                  "allocation_size": 33554432,
+                  "pid": 54092,
+                  "offset": 0
+                },
+                "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                "memory_flags": "HOST_VISIBLE",
+                "element_type": "ELEMENT_TYPE_INT32"
+              } },
+            "def": { "desc": {
+                "sample_rate": 0,
+                "num_samples": 0,
+                "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                "sample_stride": 0,
+                "channel_count": 0
+              }, "buffer": {
+                "size_in_bytes": 0,
+                "alignment": 0,
+                "external_memory": {
+                  "handle_type": 0,
+                  "handle": 0,
+                  "allocation_size": 0,
+                  "pid": 0,
+                  "offset": 0
+                },
+                "usage": "NONE",
+                "memory_flags": "NONE",
+                "element_type": "ELEMENT_TYPE_UNDEFINED"
+              } },
+            "contents_type": "PortalPin",
+            "contents": { "source_id": "a7cf60c5-d1e7-4f7b-a341-7622f2e1dbad" },
+            "orphan_state": { }
+          }
+        ],
+        "pos": { "x": 0.0, "y": 0.0 },
+        "contents_type": "Graph",
+        "contents": { "nodes": [
+            {
+              "id": "3efc1c9e-6a80-4e0f-a62f-cf798e74b1f7",
+              "name": "WaitGPUEvent",
+              "class_name": "nos.sync.WaitGPUEvent",
+              "pins": [
+                {
+                  "id": "9f55cadf-28f5-4716-a8af-9349b3898b73",
+                  "name": "Run",
+                  "type_name": "nos.exe",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "c89469b7-9772-477d-ac7b-7acab8c54685",
+                  "name": "Continue",
+                  "type_name": "nos.exe",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "f82006c0-84c5-4209-8658-5e0f173cec3d",
+                  "name": "Event",
+                  "type_name": "nos.sys.vulkan.GPUEventHolder",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "1c032d22-6b14-452f-94c5-295d81659c99",
+                  "name": "TimeoutMs",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 100,
+                  "def": 100,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                }
+              ],
+              "pos": { "x": 1682.0, "y": 1176.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Wait GPU Event",
+              "plugin_version": { "major": 12, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "1ca94be0-3c97-4a1b-ace0-843b91782623",
+              "name": "Size",
+              "class_name": "nos.internal.GraphInput",
+              "pins": [
+                {
+                  "id": "3058023b-fc1c-444d-ba7e-89edc46cd22a",
+                  "name": "Output",
+                  "type_name": "uint",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": 2,
+                  "def": 1,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "df3091b0-4706-48bf-abb2-8fb764950566",
+                  "name": "Input",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 2,
+                  "referred_by": [
+                    "a600ce89-f633-4a2d-9e21-21a7a24af91e"
+                  ],
+                  "def": 1,
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                }
+              ],
+              "pos": { "x": 817.0, "y": 1124.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Ring Size",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "4111a812-f2c5-4399-b89d-be64744c03a1",
+              "name": "OutputSampleRate",
+              "class_name": "nos.internal.GraphInput",
+              "pins": [
+                {
+                  "id": "460a3b73-fbbb-4778-addf-3aed53261ab3",
+                  "name": "Output",
+                  "type_name": "uint",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": 48000,
+                  "def": 48000,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "ff63ecf8-fad0-4baf-a970-81026a6f64eb",
+                  "name": "Input",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 48000,
+                  "referred_by": [
+                    "d7a005ab-9d9b-4b1e-9b7a-4af500bd101c"
+                  ],
+                  "def": 48000,
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                }
+              ],
+              "pos": { "x": 2046.0, "y": 825.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Out Sample Rate",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "7b211bef-eb18-4196-8af1-0a39a28a2d3f",
+              "name": "OutputChannelCount",
+              "class_name": "nos.internal.GraphInput",
+              "pins": [
+                {
+                  "id": "f1dd5d2a-6730-407e-b20f-978943822e97",
+                  "name": "Output",
+                  "type_name": "uint",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": 6,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "b3dd757c-0eda-40a3-bbe1-7ac355139ae4",
+                  "name": "Input",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 6,
+                  "referred_by": [
+                    "769748d5-1886-4bcd-ba8c-7abe4ff3bdff"
+                  ],
+                  "def": 8,
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                }
+              ],
+              "pos": { "x": 2074.0, "y": 915.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Out Channel Count",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "46423eb6-04a7-4e98-a9c7-d4c8dbf1b0d9",
+              "name": "Make",
+              "class_name": "nos.reflect.Make",
+              "pins": [
+                {
+                  "id": "e08b59d0-60ab-4912-b72b-ad68f91b92c5",
+                  "name": "Output",
+                  "type_name": "nos.Dict",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "entries": [
+                      { "key": "audio_buffer", "type_name": "nos.sys.vulkan.Buffer", "value": {
+                          "size_in_bytes": 262156,
+                          "alignment": 0,
+                          "external_memory": {
+                            "handle_type": 2,
+                            "handle": 6900,
+                            "allocation_size": 33554432,
+                            "pid": 54092,
+                            "offset": 1785184
+                          },
+                          "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                          "memory_flags": "HOST_VISIBLE",
+                          "element_type": "ELEMENT_TYPE_UNDEFINED"
+                        } },
+                      { "key": "gpu_event_holder", "type_name": "nos.sys.vulkan.GPUEventHolder", "value": { } },
+                      { "key": "host_use_completed_promise", "type_name": "nos.sync.Promise", "value": { "tag": "Host Use Complete" } }
+                    ] },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "nos.Dict"
+                },
+                {
+                  "id": "aec78b3b-5a13-4a74-8d32-9923b4dfdc65",
+                  "name": "Field 0",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 2,
+                      "handle": 6900,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 1785184
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "audio_buffer"
+                },
+                {
+                  "id": "9c912da9-38e4-416f-985b-dd748e3321a3",
+                  "name": "Field 1",
+                  "type_name": "nos.sys.vulkan.GPUEventHolder",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "gpu_event_holder"
+                },
+                {
+                  "id": "a39b7e9c-fe7f-4225-8f06-1c4937c8e49d",
+                  "name": "Field 2",
+                  "type_name": "nos.sync.Promise",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": { "tag": "Host Use Complete" },
+                  "def": { "tag": "" },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "host_use_completed_promise"
+                }
+              ],
+              "pos": { "x": 958.0, "y": 1445.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "template_parameters": [
+                { "name": "Type", "type_name": "string", "value": "nos.Dict" }
+              ],
+              "plugin_version": { "major": 3, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "4d2e7bfd-a8e5-4f19-9d9c-466a6fdd5ad8",
+              "name": "Audio",
+              "class_name": "nos.internal.GraphOutput",
+              "pins": [
+                {
+                  "id": "d4aec5e3-1a78-4d31-aba9-09f58a0b046b",
+                  "name": "Input",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 960,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 6
+                    }, "buffer": {
+                      "size_in_bytes": 27033,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6900,
+                        "allocation_size": 33554432,
+                        "pid": 54092,
+                        "offset": 0
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "a7cf60c5-d1e7-4f7b-a341-7622f2e1dbad",
+                  "name": "Output",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 960,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 6
+                    }, "buffer": {
+                      "size_in_bytes": 27033,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6900,
+                        "allocation_size": 33554432,
+                        "pid": 54092,
+                        "offset": 0
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "referred_by": [
+                    "cb075d68-2ed2-4c14-aa03-55cef5a98ad5"
+                  ],
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "d9ee85b0-923d-40f9-a348-8179d0613976",
+                  "name": "__Nodos_InputExecutionPin",
+                  "type_name": "nos.exe",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "In",
+                  "controller": "ENGINE"
+                }
+              ],
+              "pos": { "x": 2680.0, "y": 951.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "c8eeb53f-e6ba-4fdf-8742-2f3320024c8e",
+              "name": "Thread",
+              "class_name": "nos.Thread",
+              "always_execute": true,
+              "pins": [
+                {
+                  "id": "0e23eca2-50b3-4487-bffd-0b957ae1acd4",
+                  "name": "Run",
+                  "type_name": "nos.exe",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "live": true,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "4505a32f-45af-4b73-817f-26ed6063bc79",
+                  "name": "Importance",
+                  "type_name": "ulong",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "PROPERTY_ONLY",
+                  "visualizers": [],
+                  "data": 0,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                }
+              ],
+              "pos": { "x": 378.0, "y": 935.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "d6b61233-195d-47e7-8925-f9f0ec173484",
+              "name": "Break",
+              "class_name": "nos.reflect.Break",
+              "pins": [
+                {
+                  "id": "f5385287-c440-42aa-843b-554345b665d3",
+                  "name": "Input",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 5376
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "DEVICE_MEMORY HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "3503095a-870b-4f39-bc68-a816b9ebe10a",
+                  "name": "size_in_bytes",
+                  "type_name": "ulong",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 262156,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "size_in_bytes"
+                },
+                {
+                  "id": "fdae0276-05b8-4b93-b66a-580a1e12ddcd",
+                  "name": "alignment",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 0,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "alignment"
+                },
+                {
+                  "id": "43741809-e81b-41fe-b303-efcfd3d7b57c",
+                  "name": "external_memory",
+                  "type_name": "nos.sys.vulkan.ExternalMemory",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": {
+                    "handle_type": 0,
+                    "handle": 0,
+                    "allocation_size": 33554432,
+                    "pid": 54092,
+                    "offset": 5376
+                  },
+                  "def": {
+                    "handle_type": 0,
+                    "handle": 0,
+                    "allocation_size": 0,
+                    "pid": 0,
+                    "offset": 0
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "external_memory"
+                },
+                {
+                  "id": "d12b35d4-1483-4919-8add-a345320e0d16",
+                  "name": "usage",
+                  "type_name": "nos.sys.vulkan.BufferUsage",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                  "def": "NONE",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "usage"
+                },
+                {
+                  "id": "80755e6d-78d9-4339-95ec-dd1d8c8fb880",
+                  "name": "memory_flags",
+                  "type_name": "nos.sys.vulkan.MemoryFlags",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": "DEVICE_MEMORY HOST_VISIBLE",
+                  "def": "NONE",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "memory_flags"
+                },
+                {
+                  "id": "0e1f4949-49d4-4051-a023-ddee099dca44",
+                  "name": "element_type",
+                  "type_name": "nos.sys.vulkan.BufferElementType",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": "ELEMENT_TYPE_UNDEFINED",
+                  "def": "ELEMENT_TYPE_UNDEFINED",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "element_type"
+                }
+              ],
+              "pos": { "x": 304.0, "y": 1339.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Break nos.sys.vulkan.Buffer",
+              "plugin_version": { "major": 3, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "038e8e8a-d837-41fd-8bab-1c522833529e",
+              "name": "UnpackAudioBuffer",
+              "class_name": "nos.audio.UnpackAudioBuffer",
+              "always_execute": true,
+              "pins": [
+                {
+                  "id": "66ae0b8f-3360-4fae-aeea-7ad3c12849da",
+                  "name": "PrefixedAudioBuffer",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 2,
+                      "handle": 6900,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 212224
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "5caa6799-56fd-46de-8cc1-9dec4754e119",
+                  "name": "Audio",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 960,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 2
+                    }, "buffer": {
+                      "size_in_bytes": 8430,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6900,
+                        "allocation_size": 33554432,
+                        "pid": 54092,
+                        "offset": 71328
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                }
+              ],
+              "pos": { "x": 2111.0, "y": 1093.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "plugin_version": { "major": 1, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "18906817-161d-465a-9628-d880d5cb1746",
+              "name": "Resample",
+              "class_name": "nos.audio.Resample",
+              "pins": [
+                {
+                  "id": "b815eb85-975f-41ee-903f-b4721948810e",
+                  "name": "OutputSampleRate",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 48000,
+                  "def": 48000,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "Out Sample Rate"
+                },
+                {
+                  "id": "18fbb5bb-03cc-45f4-8787-a426adec732e",
+                  "name": "OutputChannelCount",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 6,
+                  "def": 2,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "Out Channel Count"
+                },
+                {
+                  "id": "2b6a741b-9311-4d1c-85a7-436c6dd9da12",
+                  "name": "InputAudioPacket",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 960,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 2
+                    }, "buffer": {
+                      "size_in_bytes": 8430,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6900,
+                        "allocation_size": 33554432,
+                        "pid": 54092,
+                        "offset": 71328
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "In Audio Packet"
+                },
+                {
+                  "id": "07f8f85d-ad04-4bc1-8f5f-a3c183e9e9c8",
+                  "name": "OutputAudioPacket",
+                  "type_name": "nos.audio.AudioPacket",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "desc": {
+                      "sample_rate": 48000,
+                      "num_samples": 960,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 4,
+                      "channel_count": 6
+                    }, "buffer": {
+                      "size_in_bytes": 27033,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 2,
+                        "handle": 6900,
+                        "allocation_size": 33554432,
+                        "pid": 54092,
+                        "offset": 0
+                      },
+                      "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                      "memory_flags": "HOST_VISIBLE",
+                      "element_type": "ELEMENT_TYPE_INT32"
+                    } },
+                  "def": { "desc": {
+                      "sample_rate": 0,
+                      "num_samples": 0,
+                      "bit_depth": "AUDIO_BIT_DEPTH_24_BIT",
+                      "sample_stride": 0,
+                      "channel_count": 0
+                    }, "buffer": {
+                      "size_in_bytes": 0,
+                      "alignment": 0,
+                      "external_memory": {
+                        "handle_type": 0,
+                        "handle": 0,
+                        "allocation_size": 0,
+                        "pid": 0,
+                        "offset": 0
+                      },
+                      "usage": "NONE",
+                      "memory_flags": "NONE",
+                      "element_type": "ELEMENT_TYPE_UNDEFINED"
+                    } },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "Out Audio Packet"
+                },
+                {
+                  "id": "2c8bf739-0ba6-4b8e-8bd1-b5d4b8a72cb1",
+                  "name": "__Nodos_OutputExecutionPin",
+                  "type_name": "nos.exe",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "Out",
+                  "controller": "ENGINE"
+                }
+              ],
+              "pos": { "x": 2391.0, "y": 915.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "description": "Resamples audio to different sample rate and channel count",
+              "display_name": "Audio Resample",
+              "plugin_version": { "major": 1, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "3f8e013a-e736-4d3b-bd15-70df412e7f4d",
+              "name": "Input",
+              "class_name": "nos.internal.GraphInput",
+              "pins": [
+                {
+                  "id": "4ed692df-1573-4b89-92d1-6dc10cd220fb",
+                  "name": "Output",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 5376
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "DEVICE_MEMORY HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                },
+                {
+                  "id": "17162951-179a-412f-a55b-abed419a0fa9",
+                  "name": "Input",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 5376
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "DEVICE_MEMORY HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "referred_by": [
+                    "f24fcd0f-a920-4de7-9a85-98d06e5dd8e5"
+                  ],
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "meta_data_map": [
+                    { "key": "PinHidden", "value": "true" }
+                  ],
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" }
+                }
+              ],
+              "pos": { "x": 289.0, "y": 1071.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "plugin_version": { "major": 0, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "7643b182-e809-4e56-b952-ff89fe29eee9",
+              "name": "BufferProvider",
+              "class_name": "nos.resource.BufferProvider",
+              "pins": [
+                {
+                  "id": "1c75ca06-4185-4aed-88d5-2d23c32d214c",
+                  "name": "Run",
+                  "type_name": "nos.exe",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "971883d6-c289-4022-9a71-9dbd8ebb3967",
+                  "name": "Continue",
+                  "type_name": "nos.exe",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "debb340a-1b9d-4e55-be53-b43cedfa43a7",
+                  "name": "OutputBuffer",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 2,
+                      "handle": 6900,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 736544
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "description": "The destination buffer that the download has started",
+                  "display_name": "Output Buffer"
+                },
+                {
+                  "id": "6fea0a1c-c982-4035-9126-c57a9029977c",
+                  "name": "GPUEventHolder",
+                  "type_name": "nos.sys.vulkan.GPUEventHolder",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "description": "A GPU Event slot for synchronization",
+                  "display_name": "GPU Event Holder"
+                },
+                {
+                  "id": "5d643fc7-e875-41a7-b439-54486cd97c99",
+                  "name": "HostUseCompletePromise",
+                  "type_name": "nos.sync.Promise",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "tag": "Host Use Complete" },
+                  "def": { "tag": "" },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "description": "Host synchronization primitive for ensuring the use of the buffer is finished",
+                  "display_name": "Host Use Complete Promise"
+                },
+                {
+                  "id": "b9461f37-e435-4099-89e2-ac4c048e636f",
+                  "name": "Alignment",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 0,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "description": "Used for creating memory-aligned buffers in memory"
+                },
+                {
+                  "id": "6e09af52-80fb-4de9-8f17-ec1c41f743a3",
+                  "name": "BufferCount",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 2,
+                  "def": 2,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "5ddf445f-a155-4cd6-b903-7c991ef67878",
+                  "name": "BufferSize",
+                  "type_name": "ulong",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 262156,
+                  "def": 1024,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "4609d4db-4317-40c4-88b8-6934970fe829",
+                  "name": "MemoryFlags",
+                  "type_name": "nos.sys.vulkan.MemoryFlags",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": "HOST_VISIBLE",
+                  "def": "HOST_VISIBLE",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "fdc85643-b4f7-42b0-8c91-513dac4d806b",
+                  "name": "Usage",
+                  "type_name": "nos.sys.vulkan.BufferUsage",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                  "def": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "1940a5b4-00c4-41fa-b185-356e1cda2858",
+                  "name": "ResizeOnPathRingSizeChanged",
+                  "type_name": "bool",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": true,
+                  "def": true,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "description": "Whether to update buffer count when there's a ring size update path command received along the path",
+                  "display_name": "Resize On Path Ring Size Changed"
+                },
+                {
+                  "id": "03a3b279-57cb-4cae-957e-3e2a18f90958",
+                  "name": "RequireHostUseCompletion",
+                  "type_name": "bool",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": true,
+                  "def": true,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "description": "Whether to give & wait a host synchronization primitive to ensure the buffer is no longer in use by the host before re-providing it again",
+                  "display_name": "Require Host Use Completion"
+                }
+              ],
+              "pos": { "x": 619.0, "y": 1202.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Buffer Provider",
+              "plugin_version": { "major": 1, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "fd42fc3b-592c-42fd-82c3-83ac28db330d",
+              "name": "HostVisibleBufferCopy",
+              "class_name": "nos.resource.HostVisibleBufferCopy",
+              "pins": [
+                {
+                  "id": "0c28e2d6-2f26-4a63-ade7-87fdc56667d5",
+                  "name": "Run",
+                  "type_name": "nos.exe",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "c19b8f6d-8d01-4205-9d37-36b2bf78bfa8",
+                  "name": "Continue",
+                  "type_name": "nos.exe",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "b3e13e06-e425-419a-a835-9d0e7ec18ca1",
+                  "name": "Source",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 5376
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "DEVICE_MEMORY HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "0728e111-93c0-44d1-bca0-c1f07a88e2d0",
+                  "name": "Destination",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 2,
+                      "handle": 6900,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 1785184
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "2c8c21eb-2c74-4e33-b973-448f03f6b86e",
+                  "name": "OutDestination",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 2,
+                      "handle": 6900,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 1785184
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "Destination"
+                }
+              ],
+              "pos": { "x": 618.0, "y": 1385.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "description": "Copies data from one buffer to another on the host.",
+              "plugin_version": { "major": 1, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "d4aaf56d-bb48-46b6-a681-efdc04124e5c",
+              "name": "ObjectRingBuffer",
+              "class_name": "nos.reflect.ObjectRingBuffer",
+              "pins": [
+                {
+                  "id": "4664da2c-68bd-4dbe-962c-1136fa28e6fe",
+                  "name": "Thread",
+                  "type_name": "nos.exe",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "bee51c36-aa85-4e5e-84e6-df097aaef179",
+                  "name": "Input",
+                  "type_name": "nos.Dict",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "entries": [
+                      { "key": "audio_buffer", "type_name": "nos.sys.vulkan.Buffer", "value": {
+                          "size_in_bytes": 262156,
+                          "alignment": 0,
+                          "external_memory": {
+                            "handle_type": 2,
+                            "handle": 6900,
+                            "allocation_size": 33554432,
+                            "pid": 54092,
+                            "offset": 1785184
+                          },
+                          "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                          "memory_flags": "HOST_VISIBLE",
+                          "element_type": "ELEMENT_TYPE_UNDEFINED"
+                        } },
+                      { "key": "gpu_event_holder", "type_name": "nos.sys.vulkan.GPUEventHolder", "value": { } },
+                      { "key": "host_use_completed_promise", "type_name": "nos.sync.Promise", "value": { "tag": "Host Use Complete" } }
+                    ] },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "d141f296-9912-4caa-8b2c-0486e316d564",
+                  "name": "Capacity",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 2,
+                  "min": 1,
+                  "def": 2,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "896711cd-b6c4-467f-9885-df073d4ffcf4",
+                  "name": "Output",
+                  "type_name": "nos.Dict",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "entries": [
+                      { "key": "audio_buffer", "type_name": "nos.sys.vulkan.Buffer", "value": {
+                          "size_in_bytes": 262156,
+                          "alignment": 0,
+                          "external_memory": {
+                            "handle_type": 2,
+                            "handle": 6900,
+                            "allocation_size": 33554432,
+                            "pid": 54092,
+                            "offset": 736544
+                          },
+                          "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                          "memory_flags": "HOST_VISIBLE",
+                          "element_type": "ELEMENT_TYPE_UNDEFINED"
+                        } },
+                      { "key": "gpu_event_holder", "type_name": "nos.sys.vulkan.GPUEventHolder", "value": { } },
+                      { "key": "host_use_completed_promise", "type_name": "nos.sync.Promise", "value": { "tag": "Host Use Complete" } }
+                    ] },
+                  "def": { },
+                  "live": true,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                }
+              ],
+              "pos": { "x": 1055.0, "y": 1264.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "description": "Queues data from a producer thread, then starts outputting them to a consumer thread when capacity is reached.\nStores only the references to the objects, not copies.",
+              "display_name": "Object Ring",
+              "plugin_version": { "major": 3, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "d1e983d3-26d5-4c1f-9ba6-711a89ba9230",
+              "name": "Break (1)",
+              "class_name": "nos.reflect.Break",
+              "pins": [
+                {
+                  "id": "880a6467-d89e-4a69-8db3-11dc84ca79e4",
+                  "name": "Input",
+                  "type_name": "nos.Dict",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": { "entries": [
+                      { "key": "audio_buffer", "type_name": "nos.sys.vulkan.Buffer", "value": {
+                          "size_in_bytes": 262156,
+                          "alignment": 0,
+                          "external_memory": {
+                            "handle_type": 2,
+                            "handle": 6900,
+                            "allocation_size": 33554432,
+                            "pid": 54092,
+                            "offset": 736544
+                          },
+                          "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                          "memory_flags": "HOST_VISIBLE",
+                          "element_type": "ELEMENT_TYPE_UNDEFINED"
+                        } },
+                      { "key": "gpu_event_holder", "type_name": "nos.sys.vulkan.GPUEventHolder", "value": { } },
+                      { "key": "host_use_completed_promise", "type_name": "nos.sync.Promise", "value": { "tag": "Host Use Complete" } }
+                    ] },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "923ad930-7c81-4035-a6da-daf0f63c5672",
+                  "name": "audio_buffer",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 2,
+                      "handle": 6900,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 736544
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "audio_buffer"
+                },
+                {
+                  "id": "a807c73a-3409-40a0-bd9a-47c4d0b61ccc",
+                  "name": "gpu_event_holder",
+                  "type_name": "nos.sys.vulkan.GPUEventHolder",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "gpu_event_holder"
+                },
+                {
+                  "id": "a4e9f14d-1750-4c8a-907b-00cc8fed7fb9",
+                  "name": "host_use_completed_promise",
+                  "type_name": "nos.sync.Promise",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": { "tag": "Host Use Complete" },
+                  "def": { "tag": "" },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "message": "" },
+                  "display_name": "host_use_completed_promise"
+                }
+              ],
+              "pos": { "x": 1301.0, "y": 1260.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "template_parameters": [
+                { "name": "Type", "type_name": "string", "value": "nos.Dict" }
+              ],
+              "plugin_version": { "major": 3, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "917ea0e8-e72b-4cf9-86b3-72a749b553a2",
+              "name": "FulFillPromise",
+              "class_name": "nos.sync.FulFillPromise",
+              "pins": [
+                {
+                  "id": "aeb12fe3-1c8e-4b63-8ac8-c9ebd6564605",
+                  "name": "Trigger",
+                  "type_name": "nos.exe",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "73960954-c6a2-43fe-8db6-bdd097ec0ee7",
+                  "name": "Continue",
+                  "type_name": "nos.exe",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "c46d7cb2-9d27-4c34-b90a-623d20b33982",
+                  "name": "Promise",
+                  "type_name": "nos.sync.Promise",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { "tag": "Host Use Complete" },
+                  "def": { "tag": "" },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                }
+              ],
+              "pos": { "x": 2466.0, "y": 1117.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Fulfill Promise",
+              "plugin_version": { "major": 12, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "6ecbd69f-0a53-428a-beb7-8743b911bf14",
+              "name": "BufferProvider (1)",
+              "class_name": "nos.resource.BufferProvider",
+              "pins": [
+                {
+                  "id": "b19af558-2767-4de1-bf88-cdd8bf591527",
+                  "name": "Run",
+                  "type_name": "nos.exe",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "d2314004-4c72-468e-b15a-26fe29384321",
+                  "name": "Continue",
+                  "type_name": "nos.exe",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "e4cd8d84-545c-46f5-8531-079ef62e1448",
+                  "name": "OutputBuffer",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 2,
+                      "handle": 6900,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 212224
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "description": "The destination buffer that the download has started",
+                  "display_name": "Output Buffer"
+                },
+                {
+                  "id": "dbf8a73d-ebb7-4363-8ff2-5f1b11efee69",
+                  "name": "GPUEventHolder",
+                  "type_name": "nos.sys.vulkan.GPUEventHolder",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "description": "A GPU Event slot for synchronization",
+                  "display_name": "GPU Event Holder"
+                },
+                {
+                  "id": "0b45e8c9-d4af-45bb-90fb-b6f3c6504cca",
+                  "name": "HostUseCompletePromise",
+                  "type_name": "nos.sync.Promise",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { "tag": "" },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { "type": "ORPHAN", "message": "Waiting on host use completion is disabled" },
+                  "description": "Host synchronization primitive for ensuring the use of the buffer is finished",
+                  "display_name": "Host Use Complete Promise"
+                },
+                {
+                  "id": "b3c01324-a852-45d2-9e4f-36faaef98a5f",
+                  "name": "Alignment",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 0,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "description": "Used for creating memory-aligned buffers in memory"
+                },
+                {
+                  "id": "01fd4ad8-dd80-4f9b-bf03-82b874a52441",
+                  "name": "BufferCount",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 1,
+                  "def": 2,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "d29101ae-f913-4445-8371-7d30a4a56bca",
+                  "name": "BufferSize",
+                  "type_name": "ulong",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 262156,
+                  "def": 1024,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "39ba40ce-306d-4e31-b2cb-6d3605aced28",
+                  "name": "MemoryFlags",
+                  "type_name": "nos.sys.vulkan.MemoryFlags",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": "HOST_VISIBLE",
+                  "def": "HOST_VISIBLE",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "e201f157-a4fa-4a08-aeb4-54c46dd67a87",
+                  "name": "Usage",
+                  "type_name": "nos.sys.vulkan.BufferUsage",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                  "def": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "08f9774c-6854-4b4e-bb71-13d55f36e7f3",
+                  "name": "ResizeOnPathRingSizeChanged",
+                  "type_name": "bool",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": false,
+                  "def": true,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "description": "Whether to update buffer count when there's a ring size update path command received along the path",
+                  "display_name": "Resize On Path Ring Size Changed"
+                },
+                {
+                  "id": "940d9bc0-7a96-4710-acae-09df0dfa67b5",
+                  "name": "RequireHostUseCompletion",
+                  "type_name": "bool",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": false,
+                  "def": true,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "description": "Whether to give & wait a host synchronization primitive to ensure the buffer is no longer in use by the host before re-providing it again",
+                  "display_name": "Require Host Use Completion"
+                }
+              ],
+              "pos": { "x": 1741.0, "y": 1478.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Buffer Provider",
+              "plugin_version": { "major": 1, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "9ca091e5-9e9f-499b-b911-6e17e5221452",
+              "name": "Break (2)",
+              "class_name": "nos.reflect.Break",
+              "pins": [
+                {
+                  "id": "8f3c1cf4-2475-4120-a0aa-6679364b5b17",
+                  "name": "Input",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 2,
+                      "handle": 6900,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 736544
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "45a2fb73-ad36-4998-af7b-4bee99d40afe",
+                  "name": "size_in_bytes",
+                  "type_name": "ulong",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 262156,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "size_in_bytes"
+                },
+                {
+                  "id": "cb6092f8-e5c8-4f32-b9be-658955d32f89",
+                  "name": "alignment",
+                  "type_name": "uint",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 0,
+                  "def": 0,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "alignment"
+                },
+                {
+                  "id": "5ac25854-5151-4249-ace1-69de87b7ee4f",
+                  "name": "external_memory",
+                  "type_name": "nos.sys.vulkan.ExternalMemory",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": {
+                    "handle_type": 2,
+                    "handle": 6900,
+                    "allocation_size": 33554432,
+                    "pid": 54092,
+                    "offset": 736544
+                  },
+                  "def": {
+                    "handle_type": 0,
+                    "handle": 0,
+                    "allocation_size": 0,
+                    "pid": 0,
+                    "offset": 0
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "external_memory"
+                },
+                {
+                  "id": "7aef17b4-13da-49a0-90de-b858c2768fd1",
+                  "name": "usage",
+                  "type_name": "nos.sys.vulkan.BufferUsage",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                  "def": "NONE",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "usage"
+                },
+                {
+                  "id": "3ec97f3c-f955-450d-8489-90f0cada78be",
+                  "name": "memory_flags",
+                  "type_name": "nos.sys.vulkan.MemoryFlags",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": "HOST_VISIBLE",
+                  "def": "NONE",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "memory_flags"
+                },
+                {
+                  "id": "0cc8a36d-cc2c-438b-bf9a-7187bc90cca6",
+                  "name": "element_type",
+                  "type_name": "nos.sys.vulkan.BufferElementType",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": "ELEMENT_TYPE_UNDEFINED",
+                  "def": "ELEMENT_TYPE_UNDEFINED",
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "element_type"
+                }
+              ],
+              "pos": { "x": 1449.0, "y": 1452.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Break nos.sys.vulkan.Buffer",
+              "plugin_version": { "major": 3, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "f84dc6c4-f497-43ce-8da6-5037122357dd",
+              "name": "HostVisibleBufferCopy (1)",
+              "class_name": "nos.resource.HostVisibleBufferCopy",
+              "pins": [
+                {
+                  "id": "b7847d29-70e5-45f6-b12f-dd392324e349",
+                  "name": "Run",
+                  "type_name": "nos.exe",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "c136e4b4-5c21-4564-9699-4f3b537e04b5",
+                  "name": "Continue",
+                  "type_name": "nos.exe",
+                  "show_as": "PROPERTY",
+                  "can_show_as": "OUTPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "cc9d7c97-798c-40fb-9c1a-df2e691696f5",
+                  "name": "Source",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 2,
+                      "handle": 6900,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 736544
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "05e07651-7a82-4330-b587-1d4e3b269065",
+                  "name": "Destination",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 2,
+                      "handle": 6900,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 212224
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "dac9b736-3805-4c38-aa81-c2f776ec3755",
+                  "name": "OutDestination",
+                  "type_name": "nos.sys.vulkan.Buffer",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": {
+                    "size_in_bytes": 262156,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 2,
+                      "handle": 6900,
+                      "allocation_size": 33554432,
+                      "pid": 54092,
+                      "offset": 212224
+                    },
+                    "usage": "TRANSFER_SRC TRANSFER_DST STORAGE_BUFFER",
+                    "memory_flags": "HOST_VISIBLE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "def": {
+                    "size_in_bytes": 0,
+                    "alignment": 0,
+                    "external_memory": {
+                      "handle_type": 0,
+                      "handle": 0,
+                      "allocation_size": 0,
+                      "pid": 0,
+                      "offset": 0
+                    },
+                    "usage": "NONE",
+                    "memory_flags": "NONE",
+                    "element_type": "ELEMENT_TYPE_UNDEFINED"
+                  },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "Destination"
+                },
+                {
+                  "id": "15173422-3e15-4cc2-b8bb-7def31cee35d",
+                  "name": "__Nodos_OutputExecutionPin",
+                  "type_name": "nos.exe",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "Out",
+                  "controller": "ENGINE"
+                },
+                {
+                  "id": "db3d679e-3086-4abb-a008-7ece05345a9b",
+                  "name": "__Nodos_InputExecutionPin",
+                  "type_name": "nos.exe",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { },
+                  "display_name": "In",
+                  "controller": "ENGINE"
+                }
+              ],
+              "pos": { "x": 2032.0, "y": 1314.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "description": "Copies data from one buffer to another on the host.",
+              "plugin_version": { "major": 1, "minor": 0, "patch": 0 }
+            },
+            {
+              "id": "a1965be5-6d34-4d10-a96b-7274069ae180",
+              "name": "WaitGPUEvent (1)",
+              "class_name": "nos.sync.WaitGPUEvent",
+              "pins": [
+                {
+                  "id": "ede9c398-fe82-4c74-b4fd-a50477d01537",
+                  "name": "Run",
+                  "type_name": "nos.exe",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "ea657c72-e7b4-4aa9-8671-d35d1c1b8b90",
+                  "name": "Continue",
+                  "type_name": "nos.exe",
+                  "show_as": "OUTPUT_PIN",
+                  "can_show_as": "OUTPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "9780d354-7fb2-477a-bf04-ba3ed6b861a9",
+                  "name": "Event",
+                  "type_name": "nos.sys.vulkan.GPUEventHolder",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_ONLY",
+                  "visualizers": [],
+                  "data": { },
+                  "def": { },
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                },
+                {
+                  "id": "00b09557-e0b7-4983-a53c-9eb4c58daddd",
+                  "name": "TimeoutMs",
+                  "type_name": "uint",
+                  "show_as": "INPUT_PIN",
+                  "can_show_as": "INPUT_PIN_OR_PROPERTY",
+                  "visualizers": [],
+                  "data": 100,
+                  "def": 100,
+                  "contents_type": "JobPin",
+                  "contents": { },
+                  "orphan_state": { }
+                }
+              ],
+              "pos": { "x": 2315.0, "y": 1346.0 },
+              "contents_type": "Job",
+              "contents": { "type": "" },
+              "function_category": "Default Node",
+              "display_name": "Wait GPU Event",
+              "plugin_version": { "major": 12, "minor": 0, "patch": 0 }
+            }
+          ], "connections": [
+            { "from": "f1dd5d2a-6730-407e-b20f-978943822e97", "to": "18fbb5bb-03cc-45f4-8787-a426adec732e", "id": "d9e3197b-8d20-4be9-b2f1-fcbfeca41132" },
+            { "from": "c89469b7-9772-477d-ac7b-7acab8c54685", "to": "db3d679e-3086-4abb-a008-7ece05345a9b", "id": "40a2abca-c6e8-4064-9cc3-7cfde5cb9a17" },
+            { "from": "73960954-c6a2-43fe-8db6-bdd097ec0ee7", "to": "d9ee85b0-923d-40f9-a348-8179d0613976", "id": "3f89247f-c5fd-4446-a7f4-ec07e3443035" },
+            { "from": "5caa6799-56fd-46de-8cc1-9dec4754e119", "to": "2b6a741b-9311-4d1c-85a7-436c6dd9da12", "id": "c88eeaaa-4365-4cda-af8e-b88c77cd8069" },
+            { "from": "6fea0a1c-c982-4035-9126-c57a9029977c", "to": "9c912da9-38e4-416f-985b-dd748e3321a3", "id": "21249af3-7cd2-4c31-a4df-6e5dc534fb7a" },
+            { "from": "e08b59d0-60ab-4912-b72b-ad68f91b92c5", "to": "bee51c36-aa85-4e5e-84e6-df097aaef179", "id": "785c87f5-94c5-434e-9e65-e105dd93c913" },
+            { "from": "07f8f85d-ad04-4bc1-8f5f-a3c183e9e9c8", "to": "d4aec5e3-1a78-4d31-aba9-09f58a0b046b", "id": "cd1310f4-6937-4e3b-a013-422a3c143c26" },
+            { "from": "3503095a-870b-4f39-bc68-a816b9ebe10a", "to": "5ddf445f-a155-4cd6-b903-7c991ef67878", "id": "f34043e8-41c5-4698-a7c3-ff2cdb979250" },
+            { "from": "a807c73a-3409-40a0-bd9a-47c4d0b61ccc", "to": "f82006c0-84c5-4209-8658-5e0f173cec3d", "id": "d4f42761-ff43-4c34-b613-2813801a433c" },
+            { "from": "460a3b73-fbbb-4778-addf-3aed53261ab3", "to": "b815eb85-975f-41ee-903f-b4721948810e", "id": "077b7c57-d9a4-44ad-a4e3-46fee3ad8f65" },
+            { "from": "4ed692df-1573-4b89-92d1-6dc10cd220fb", "to": "f5385287-c440-42aa-843b-554345b665d3", "id": "106b6f74-4384-41f5-86fb-72bef595d534" },
+            { "from": "0e23eca2-50b3-4487-bffd-0b957ae1acd4", "to": "1c75ca06-4185-4aed-88d5-2d23c32d214c", "id": "c4626088-dc1f-471c-808b-d91e915fb3fd" },
+            { "from": "ea657c72-e7b4-4aa9-8671-d35d1c1b8b90", "to": "aeb12fe3-1c8e-4b63-8ac8-c9ebd6564605", "id": "3af45cf8-e387-4ab3-beba-5d54181d8987" },
+            { "from": "debb340a-1b9d-4e55-be53-b43cedfa43a7", "to": "0728e111-93c0-44d1-bca0-c1f07a88e2d0", "id": "a2d8eca3-12c8-4e64-8120-b4e842b41110" },
+            { "from": "4ed692df-1573-4b89-92d1-6dc10cd220fb", "to": "b3e13e06-e425-419a-a835-9d0e7ec18ca1", "id": "2542a197-c469-4c1f-9869-36a3cd3102bc" },
+            { "from": "2c8c21eb-2c74-4e33-b973-448f03f6b86e", "to": "aec78b3b-5a13-4a74-8d32-9923b4dfdc65", "id": "0cb1d20d-5c14-4ac7-8c2a-28c954977878" },
+            { "from": "5d643fc7-e875-41a7-b439-54486cd97c99", "to": "a39b7e9c-fe7f-4225-8f06-1c4937c8e49d", "id": "09faf6f3-507b-4a25-a584-359db5368ebc" },
+            { "from": "971883d6-c289-4022-9a71-9dbd8ebb3967", "to": "4664da2c-68bd-4dbe-962c-1136fa28e6fe", "id": "fa3f371d-cfab-4835-9303-7d413b664a3a" },
+            { "from": "923ad930-7c81-4035-a6da-daf0f63c5672", "to": "cc9d7c97-798c-40fb-9c1a-df2e691696f5", "id": "98ad6c8f-18cc-4f44-bfd7-747e8c3cdc14" },
+            { "from": "896711cd-b6c4-467f-9885-df073d4ffcf4", "to": "880a6467-d89e-4a69-8db3-11dc84ca79e4", "id": "2f549ad0-0c8f-40de-b292-832acfe5b60e" },
+            { "from": "3058023b-fc1c-444d-ba7e-89edc46cd22a", "to": "d141f296-9912-4caa-8b2c-0486e316d564", "id": "3276e6ed-cd7a-4819-9c63-ba52eb75cbd0" },
+            { "from": "a4e9f14d-1750-4c8a-907b-00cc8fed7fb9", "to": "c46d7cb2-9d27-4c34-b90a-623d20b33982", "id": "299c18fa-ffc8-4b77-8b01-a6cb50c59aa1" },
+            { "from": "923ad930-7c81-4035-a6da-daf0f63c5672", "to": "8f3c1cf4-2475-4120-a0aa-6679364b5b17", "id": "3c79fa7d-8886-4169-927a-5d2d5760434b" },
+            { "from": "45a2fb73-ad36-4998-af7b-4bee99d40afe", "to": "d29101ae-f913-4445-8371-7d30a4a56bca", "id": "36adc52b-62ef-4ae1-967c-ef30a29b456f" },
+            { "from": "e4cd8d84-545c-46f5-8531-079ef62e1448", "to": "05e07651-7a82-4330-b587-1d4e3b269065", "id": "8191aff1-62c1-43d6-bf58-da175d76130c" },
+            { "from": "dbf8a73d-ebb7-4363-8ff2-5f1b11efee69", "to": "9780d354-7fb2-477a-bf04-ba3ed6b861a9", "id": "eba6864b-7088-4fc8-9294-eada5fdbc03f" },
+            { "from": "15173422-3e15-4cc2-b8bb-7def31cee35d", "to": "ede9c398-fe82-4c74-b4fd-a50477d01537", "id": "26a20728-54b0-49b3-8863-420c545b5c19" },
+            { "from": "dac9b736-3805-4c38-aa81-c2f776ec3755", "to": "66ae0b8f-3360-4fae-aeea-7ad3c12849da", "id": "e96f85ca-eafc-4812-8a7a-31af83433e11" }
+          ] },
+        "function_category": "Default Node",
+        "plugin_version": { "major": 1, "minor": 0, "patch": 0 }
+      }
+    }
+  ] }
