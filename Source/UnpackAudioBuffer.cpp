@@ -4,6 +4,7 @@
 
 #include <nosSysVulkan/Helpers.hpp>
 #include <cmath>
+#include <cstring>
 #include <string>
 
 #include "NodeErrors.h"
@@ -62,6 +63,7 @@ struct UnpackAudioBuffer : NodeContext
 		if (!inputInfo)
 		{
 			Errors.Set(ErrorType::Input, fb::NodeStatusMessageType::FAILURE, "No audio buffer to unpack");
+			PublishSilence();
 			return NOS_RESULT_SUCCESS;
 		}
 
@@ -70,6 +72,7 @@ struct UnpackAudioBuffer : NodeContext
 		{
 			Errors.Set(ErrorType::Input, fb::NodeStatusMessageType::FAILURE, "Audio buffer is too small to hold a packet header",
 				"It holds " + std::to_string(inputSize) + " bytes, the header alone needs " + std::to_string(PREFIX_SIZE) + ".");
+			PublishSilence();
 			return NOS_RESULT_SUCCESS;
 		}
 
@@ -79,6 +82,7 @@ struct UnpackAudioBuffer : NodeContext
 		{
 			Errors.Set(ErrorType::Input, fb::NodeStatusMessageType::FAILURE, "Audio buffer cannot be read",
 				"The buffer has to be host visible for this node to unpack it.");
+			PublishSilence();
 			return NOS_RESULT_SUCCESS;
 		}
 		Errors.Clear(ErrorType::Input);
@@ -95,6 +99,7 @@ struct UnpackAudioBuffer : NodeContext
 			if (++SilentExecutions >= SILENT_EXECUTIONS_BEFORE_WARNING)
 				Errors.Set(ErrorType::Header, fb::NodeStatusMessageType::WARNING, "No audio is arriving",
 					"The buffer holds an empty packet. Whatever feeds it has not written audio for a while.");
+			PublishSilence();
 			return NOS_RESULT_SUCCESS;
 		}
 		SilentExecutions = 0;
@@ -103,6 +108,7 @@ struct UnpackAudioBuffer : NodeContext
 		{
 			Errors.Set(ErrorType::Header, fb::NodeStatusMessageType::WARNING, "Audio packet header does not make sense",
 				DescribeHeader(sampleRate, numSamples, channelCount));
+			PublishSilence();
 			return NOS_RESULT_SUCCESS;
 		}
 
@@ -113,57 +119,79 @@ struct UnpackAudioBuffer : NodeContext
 			Errors.Set(ErrorType::Header, fb::NodeStatusMessageType::WARNING, "Audio packet claims more samples than the buffer holds",
 				DescribeHeader(sampleRate, numSamples, channelCount) + " That needs " + std::to_string(neededSize) +
 					" bytes, the buffer holds " + std::to_string(inputSize) + ".");
+			PublishSilence();
 			return NOS_RESULT_SUCCESS;
 		}
 		Errors.Clear(ErrorType::Header);
 
+		// Kept so silence can be published in the same shape when the next packet
+		// turns out to be unreadable.
+		LastSampleRate = sampleRate;
+		LastNumSamples = numSamples;
+		LastChannelCount = channelCount;
+
 		// Point to the float audio data after the prefix
 		float* inputAudioSamples = reinterpret_cast<float*>(inputData + PREFIX_SIZE);
-		
+		Publish(sampleRate, numSamples, channelCount, inputAudioSamples);
+
+		return NOS_RESULT_SUCCESS;
+	}
+
+	// Writes one packet to the Audio pin: the samples converted, or silence when
+	// there are none to convert. Everything that reaches the pin goes through here.
+	bool Publish(int32_t sampleRate, int32_t numSamples, int32_t channelCount, float const* samples)
+	{
+		const uint64_t sampleCount = uint64_t(numSamples) * uint64_t(channelCount);
+
 		// Create or resize audio buffer only if needed (with 1.1x headroom to avoid frequent reallocations)
 		size_t requiredBufferSize = std::max(size_t(sampleCount * sizeof(uint32_t)), size_t(1000));
 		size_t allocatedBufferSize = OutputAudioBuffer ? sys::vulkan::GetResourceInfo(OutputAudioBuffer)->Size : 0;
-		
+
 		if (!OutputAudioBuffer || requiredBufferSize > allocatedBufferSize)
 		{
 			OutputAudioBuffer = {};
-			
+
 			// Allocate 1.1x the required size to reduce frequency of reallocations
 			size_t newBufferSize = requiredBufferSize * 1.1f;
-			
+
 			nosBufferInfo audioBufferDesc = {};
 			audioBufferDesc.Size = static_cast<uint32_t>(newBufferSize);
 			audioBufferDesc.Usage = nosBufferUsage(NOS_BUFFER_USAGE_STORAGE_BUFFER | NOS_BUFFER_USAGE_TRANSFER_DST | NOS_BUFFER_USAGE_TRANSFER_SRC);
 			audioBufferDesc.MemoryFlags = nosMemoryFlags(NOS_MEMORY_FLAGS_HOST_VISIBLE);
 			audioBufferDesc.ElementType = NOS_BUFFER_ELEMENT_TYPE_INT32;
-			
+
 			OutputAudioBuffer = sys::vulkan::CreateBuffer(audioBufferDesc, "Unpacked Audio Buffer");
 			if (!OutputAudioBuffer)
 			{
 				Errors.Set(ErrorType::Output, fb::NodeStatusMessageType::FAILURE, "Cannot create the unpacked audio buffer",
 					"Asked for " + std::to_string(audioBufferDesc.Size) + " bytes.");
-				return NOS_RESULT_SUCCESS;
+				return false;
 			}
 		}
-		
+
 		int32_t* outputAudioSamples = reinterpret_cast<int32_t*>(nosVulkan->Map(OutputAudioBuffer));
 		if (!outputAudioSamples)
 		{
 			Errors.Set(ErrorType::Output, fb::NodeStatusMessageType::FAILURE, "Cannot write the unpacked audio buffer");
-			return NOS_RESULT_SUCCESS;
+			return false;
 		}
 		Errors.Clear(ErrorType::Output);
-		
-		// Convert float samples to 24-bit MSB int32 format
-		for (uint64_t i = 0; i < sampleCount; ++i)
+
+		if (samples)
 		{
-			// Clamp float sample to [-1.0, 1.0] range
-			float floatSample = std::max(-1.0f, std::min(1.0f, inputAudioSamples[i]));
-			
-			// Store as 32-bit with 24-bit sample in MSB (shift left by 8 bits)
-			outputAudioSamples[i] = FloatToShiftedInt24(floatSample);
+			// Convert float samples to 24-bit MSB int32 format
+			for (uint64_t i = 0; i < sampleCount; ++i)
+			{
+				// Clamp float sample to [-1.0, 1.0] range
+				float floatSample = std::max(-1.0f, std::min(1.0f, samples[i]));
+
+				// Store as 32-bit with 24-bit sample in MSB (shift left by 8 bits)
+				outputAudioSamples[i] = FloatToShiftedInt24(floatSample);
+			}
 		}
-		
+		else
+			std::memset(outputAudioSamples, 0, sampleCount * sizeof(int32_t));
+
 		AudioPacketDescriptor audioPacketDesc(
 			sampleRate, numSamples, BitDepth::AUDIO_BIT_DEPTH_24_BIT, 4, channelCount);
 
@@ -174,11 +202,20 @@ struct UnpackAudioBuffer : NodeContext
 		audioPacketFields[NOS_NAME("buffer")] = OutputAudioBuffer;
 		auto audioPacket = CompositeObjectRef::Create(NOS_NAME("nos.audio.AudioPacket"), audioPacketFields);
 		if (!audioPacket)
-			return NOS_RESULT_FAILED;
+			return false;
 
 		SetPinObject(NOS_NAME("Audio"), *audioPacket);
+		return true;
+	}
 
-		return NOS_RESULT_SUCCESS;
+	// The shape of the last packet that made sense, with nothing in it. Leaving the
+	// pin alone instead hands the reader the packet before this one, and it plays
+	// that on a loop for as long as the producer stays quiet. Before any packet has
+	// arrived there is no shape to be silent in, so the pin waits for a first one.
+	void PublishSilence()
+	{
+		if (LastSampleRate > 0)
+			Publish(LastSampleRate, LastNumSamples, LastChannelCount, nullptr);
 	}
 
 	static std::string DescribeHeader(int32_t sampleRate, int32_t numSamples, int32_t channelCount)
@@ -189,6 +226,9 @@ struct UnpackAudioBuffer : NodeContext
 
 	NodeErrors<ErrorType> Errors{*this};
 	uint32_t SilentExecutions = 0;
+	int32_t LastSampleRate = 0;
+	int32_t LastNumSamples = 0;
+	int32_t LastChannelCount = 0;
 	TypedObjectRef<sys::vulkan::Buffer> OutputAudioBuffer;
 };
 
@@ -198,4 +238,3 @@ nosResult RegisterUnpackAudioBufferNode(nosNodeFunctions* fn)
 	return NOS_RESULT_SUCCESS;
 }
 } // namespace nos::audio
-
